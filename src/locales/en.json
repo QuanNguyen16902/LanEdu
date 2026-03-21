@@ -1,0 +1,76 @@
+{
+  "common": {
+    "login": "Login",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "attendance": "Attendance",
+    "assignments": "Assignments",
+    "students": "Students",
+    "evaluations": "Evaluations",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "name": "Name",
+    "role": "Role",
+    "email": "Email",
+    "password": "Password",
+    "welcome": "Welcome back",
+    "summary": "Summary",
+    "view_all": "View All",
+    "language": "Language",
+    "english": "English",
+    "vietnamese": "Vietnamese",
+    "report": "Report",
+    "enrollment": "Enrollment"
+  },
+  "auth": {
+    "login_title": "Sign in to LanEdu",
+    "login_description": "Enter your credentials to access your account",
+    "invalid_credentials": "Invalid email or password",
+    "success": "Logged in successfully"
+  },
+  "dashboard": {
+    "total_students": "Total Students",
+    "total_classes": "Total Classes",
+    "active_assignments": "Active Assignments",
+    "attendance_rate": "Attendance Rate",
+    "attendance_by_class": "Attendance by Class",
+    "today_schedule": "Today's Schedule",
+    "recent_activities": "Recent Activities"
+  },
+  "attendance": {
+    "mark_attendance": "Mark Attendance",
+    "present": "Present",
+    "absent": "Absent",
+    "excused": "Excused",
+    "unexcused": "Unexcused",
+    "late": "Late",
+    "history": "Attendance History",
+    "filter_by_class": "Filter by Class",
+    "filter_by_date": "Filter by Date",
+    "attendance_report": "Attendance Report"
+  },
+  "assignments": {
+    "create_new": "Create Assignment",
+    "title": "Title",
+    "description": "Description",
+    "due_date": "Due Date",
+    "attachments": "Attachments",
+    "submit": "Submit Assignment",
+    "submitted": "Submitted",
+    "missing": "Missing",
+    "late": "Late",
+    "pending": "Pending"
+  },
+  "evaluations": {
+    "score": "Score",
+    "comment": "Comment",
+    "history": "Evaluation History",
+    "grading_system": "Grading System",
+    "give_feedback": "Give Feedback"
+  }
+}

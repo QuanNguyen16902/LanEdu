@@ -1,0 +1,76 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "dashboard": "Bảng điều khiển",
+    "attendance": "Điểm danh",
+    "assignments": "Bài tập",
+    "students": "Học sinh",
+    "evaluations": "Đánh giá",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "actions": "Thao tác",
+    "status": "Trạng thái",
+    "date": "Ngày",
+    "name": "Tên",
+    "role": "Vai trò",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "welcome": "Chào mừng trở lại",
+    "summary": "Tổng quan",
+    "view_all": "Xem tất cả",
+    "language": "Ngôn ngữ",
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt",
+    "report": "Báo cáo",
+    "enrollment": "Sĩ số"
+  },
+  "auth": {
+    "login_title": "Đăng nhập vào LanEdu",
+    "login_description": "Nhập thông tin của bạn để truy cập tài khoản",
+    "invalid_credentials": "Email hoặc mật khẩu không đúng",
+    "success": "Đăng nhập thành công"
+  },
+  "dashboard": {
+    "total_students": "Tổng số học sinh",
+    "total_classes": "Tổng số lớp",
+    "active_assignments": "Bài tập đang mở",
+    "attendance_rate": "Tỷ lệ điểm danh",
+    "attendance_by_class": "Điểm danh theo lớp",
+    "today_schedule": "Lịch học hôm nay",
+    "recent_activities": "Hoạt động gần đây"
+  },
+  "attendance": {
+    "mark_attendance": "Điểm danh",
+    "present": "Có mặt",
+    "absent": "Vắng mặt",
+    "excused": "Có phép",
+    "unexcused": "Không phép",
+    "late": "Muộn",
+    "history": "Lịch sử điểm danh",
+    "filter_by_class": "Lọc theo lớp",
+    "filter_by_date": "Lọc theo ngày",
+    "attendance_report": "Báo cáo điểm danh"
+  },
+  "assignments": {
+    "create_new": "Tạo bài tập mới",
+    "title": "Tiêu đề",
+    "description": "Mô tả",
+    "due_date": "Hạn nộp",
+    "attachments": "Tệp đính kèm",
+    "submit": "Nộp bài",
+    "submitted": "Đã nộp",
+    "missing": "Chưa nộp",
+    "late": "Nộp muộn",
+    "pending": "Đang chờ"
+  },
+  "evaluations": {
+    "score": "Điểm số",
+    "comment": "Nhận xét",
+    "history": "Lịch sử đánh giá",
+    "grading_system": "Hệ thống điểm",
+    "give_feedback": "Đưa ra nhận xét"
+  }
+}
