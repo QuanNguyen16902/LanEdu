@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
+import {
   LogOut,
   Menu,
   X,
@@ -23,7 +23,7 @@ export function Topbar() {
   const menuItems = [
     { icon: Home, label: 'Trang chủ', path: '/', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
     { icon: LayoutGrid, label: 'Quản lý học sinh', path: '/classes', roles: ['ADMIN', 'TEACHER'] },
-    { icon: BookOpenText, label: 'Học thuật', path: '/assignments', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
+    { icon: BookOpenText, label: 'Bài Đăng', path: '/assignments', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
   ];
 
   const filteredItems = menuItems.filter(item => item.roles.includes(user?.role || ''));
@@ -33,7 +33,7 @@ export function Topbar() {
       <div className="max-w-full mx-auto px-6 h-14 flex items-center justify-between gap-6">
         <div className="flex items-center gap-10 shrink-0">
           <Logo size="md" />
-          
+
           <nav className="hidden lg:flex items-center gap-1">
             {filteredItems.map((item) => (
               <NavLink
@@ -41,8 +41,8 @@ export function Topbar() {
                 to={item.path}
                 className={({ isActive }) => cn(
                   "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 relative group",
-                  isActive 
-                    ? "text-gold-600 bg-gold-50/50" 
+                  isActive
+                    ? "text-gold-600 bg-gold-50/50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 )}
               >
@@ -66,22 +66,22 @@ export function Topbar() {
           </div>
 
           <div className="flex items-center gap-3">
-             <div className="hidden md:flex flex-col items-end">
-                <span className="text-[12px] font-bold text-gray-900">{user?.name}</span>
-                <Badge variant={user?.role === 'ADMIN' ? 'danger' : user?.role === 'TEACHER' ? 'info' : 'success'} className="px-1.5 py-0 h-4 text-[9px] font-medium border-none">
-                   {user?.role}
-                </Badge>
-             </div>
-             <button 
-                onClick={logout}
-                className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all"
-                title={t('common.logout')}
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
+            <div className="hidden md:flex flex-col items-end">
+              <span className="text-[12px] font-bold text-gray-900">{user?.name}</span>
+              <Badge variant={user?.role === 'ADMIN' ? 'danger' : user?.role === 'TEACHER' ? 'info' : 'success'} className="px-1.5 py-0 h-4 text-[9px] font-medium border-none">
+                {user?.role}
+              </Badge>
+            </div>
+            <button
+              onClick={logout}
+              className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-all"
+              title={t('common.logout')}
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
 
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
           >

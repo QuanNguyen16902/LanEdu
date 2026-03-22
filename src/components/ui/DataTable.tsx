@@ -106,7 +106,7 @@ export function DataTable<T>({
         <div className="flex items-center gap-4 flex-1">
           {title && <h2 className="text-xl font-bold text-text-primary whitespace-nowrap">{title}</h2>}
           <div className="relative max-w-sm w-full">
-            <Search className="absolute left-3 top-1/2 -trangray-y-1/2 h-4 w-4 text-text-disabled" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-disabled" />
             <Input 
               placeholder="Search data..." 
               value={globalFilter}

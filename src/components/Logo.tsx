@@ -25,29 +25,15 @@ export function Logo({ className, showText = true, size = 'md', dark = false }: 
     <div className={cn("flex items-center gap-2", className)}>
       <div className={cn("relative flex items-center justify-center", iconSizes[size])}>
         {/* Abstract Orchid Flower Shape */}
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full text-gold-500"
-        >
-          <path
-            d="M12 22C12 22 16 18 16 14C16 10 12 8 12 8C12 8 8 10 8 14C8 18 12 22 Z"
-            fill="currentColor"
-            fillOpacity="0.8"
-          />
-          <path
-            d="M12 8C12 8 18 6 20 10C22 14 18 16 18 16C18 16 16 12 12 8Z"
-            fill="currentColor"
-            fillOpacity="0.6"
-          />
-          <path
-            d="M12 8C12 8 6 6 4 10C2 14 6 16 6 16C6 16 8 12 12 8Z"
-            fill="currentColor"
-            fillOpacity="0.6"
-          />
-          <circle cx="12" cy="10" r="2" fill="currentColor" />
-        </svg>
+        <img 
+          src="/assets/images/orchid_logo.png" 
+          alt="LanEdu Logo" 
+          className="w-full h-full object-contain"
+          onError={(e) => {
+            // Fallback to SVG if image fails
+            e.currentTarget.style.display = 'none';
+          }}
+        />
       </div>
       {showText && (
         <span className={cn(

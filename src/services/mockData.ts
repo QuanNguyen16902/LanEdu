@@ -7,6 +7,7 @@ export interface Student {
   class: string;
   attendance: number;
   score: number;
+  pricePerSession?: number;
 }
 
 export interface Assignment {
@@ -16,6 +17,10 @@ export interface Assignment {
   dueDate: string;
   status: 'SUBMITTED' | 'MISSING' | 'LATE' | 'PENDING';
   teacherId: string;
+  grade?: string;
+  classId?: string;
+  pdfUrl?: string;
+  externalUrl?: string;
 }
 
 export interface AttendanceRecord {
@@ -44,9 +49,40 @@ export const mockStudents: Student[] = [
 ];
 
 export const mockAssignments: Assignment[] = [
-  { id: '1', title: 'IELTS Writing Task 1 - Data Analysis', description: 'Describe the trends shown in the line graph on page 45 of your textbook.', dueDate: '2026-03-25', status: 'PENDING', teacherId: 't1' },
-  { id: '2', title: 'English Grammar - Passive Voice', description: 'Rewrite the following 10 sentences using the passive voice. Minimum 15 words per sentence.', dueDate: '2026-03-22', status: 'SUBMITTED', teacherId: 't1' },
-  { id: '3', title: 'Unit 5 Vocabulary - Science & Technology', description: 'Memorize 20 new words related to technology and practice using them in sentences.', dueDate: '2026-03-20', status: 'LATE', teacherId: 't2' },
+  { 
+    id: '1', 
+    title: 'IELTS Writing Task 1 - Data Analysis', 
+    description: 'Describe the trends shown in the line graph on page 45 of your textbook.', 
+    dueDate: '2026-03-25', 
+    status: 'PENDING', 
+    teacherId: 't1',
+    grade: '10',
+    classId: '10A1',
+    pdfUrl: 'https://example.com/writing-task-1.pdf',
+    externalUrl: 'https://ielts.org/writing-tips'
+  },
+  { 
+    id: '2', 
+    title: 'English Grammar - Passive Voice', 
+    description: 'Rewrite the following 10 sentences using the passive voice. Minimum 15 words per sentence.', 
+    dueDate: '2026-03-22', 
+    status: 'SUBMITTED', 
+    teacherId: 't1',
+    grade: '10',
+    classId: '10A1',
+    pdfUrl: 'https://example.com/passive-voice-ex.pdf'
+  },
+  { 
+    id: '3', 
+    title: 'Unit 5 Vocabulary - Science & Technology', 
+    description: 'Memorize 20 new words related to technology and practice using them in sentences.', 
+    dueDate: '2026-03-20', 
+    status: 'LATE', 
+    teacherId: 't2',
+    grade: '7',
+    classId: '7a1',
+    externalUrl: 'https://quizlet.com/unit-5-vocab'
+  },
 ];
 
 export const mockAttendance: AttendanceRecord[] = [
@@ -62,6 +98,19 @@ export const mockAttendance: AttendanceRecord[] = [
   { id: '10', studentId: 'ED0120320183', date: '2026-03-17', status: 'LATE', classId: '10A1' },
   { id: '11', studentId: '3', date: '2026-03-17', status: 'PRESENT', classId: '10A2' },
   { id: '12', studentId: '4', date: '2026-03-17', status: 'ABSENT', classId: '10A2' },
+  // Demo students for Class 7a1
+  { id: 'att-1', studentId: 'ED0119310177', date: '2026-03-02', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-2', studentId: 'ED0119310177', date: '2026-03-05', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-3', studentId: 'ED0119310177', date: '2026-03-09', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-4', studentId: 'ED0119310177', date: '2026-03-12', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-5', studentId: 'ED0119310177', date: '2026-03-16', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-6', studentId: 'ED0119310177', date: '2026-03-19', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-7', studentId: 'ED0119310177', date: '2026-03-23', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-8', studentId: 'ED0121310006', date: '2026-03-02', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-9', studentId: 'ED0121310006', date: '2026-03-05', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-10', studentId: 'ED0121310006', date: '2026-03-09', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-11', studentId: 'ED0121310006', date: '2026-03-12', status: 'PRESENT', classId: '7a1' },
+  { id: 'att-12', studentId: 'ED0121310006', date: '2026-03-16', status: 'PRESENT', classId: '7a1' },
 ];
 
 export const mockEvaluations: Evaluation[] = [

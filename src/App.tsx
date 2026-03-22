@@ -10,6 +10,7 @@ import AssignmentsPage from '@/pages/Assignments';
 import EvaluationsPage from '@/pages/Evaluations';
 import StudentsPage from '@/pages/Students';
 import ClassManagementPage from '@/pages/ClassManagement';
+import PostsPage from '@/pages/Posts';
 import TuitionFeePage from '@/pages/TuitionFee';
 import SchedulePage from '@/pages/Schedule';
 import UnauthorizedPage from '@/pages/Unauthorized';
@@ -36,6 +37,11 @@ export default function App() {
             } />
             <Route path="/assignments" element={
               <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER', 'STUDENT']}>
+                <PostsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/management/assignments" element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}>
                 <AssignmentsPage />
               </ProtectedRoute>
             } />

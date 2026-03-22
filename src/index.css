@@ -13,17 +13,23 @@
   /* Neutrals */
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-border: #E5E7EB;    /* Gray 200 */
-  --color-border-dark: #D1D5DB; /* Gray 300 */
+  --color-border: #E5E7EB;
+  /* Gray 200 */
+  --color-border-dark: #D1D5DB;
+  /* Gray 300 */
 
   /* Text - High Contrast Neutral Gray */
-  --color-text-primary: #020617;   /* Gray 950 */
-  --color-text-secondary: #374151; /* Gray 700 */
-  --color-text-disabled: #6B7280;  /* Gray 500 */
+  --color-text-primary: #020617;
+  /* Gray 950 */
+  --color-text-secondary: #374151;
+  /* Gray 700 */
+  --color-text-disabled: #6B7280;
+  /* Gray 500 */
 
   /* Supporting */
   --color-success: #10B981;
-  --color-warning: #E6B800; /* Use primary for warning consistency */
+  --color-warning: #E6B800;
+  /* Use primary for warning consistency */
   --color-error: #EF4444;
   --color-info: #3B82F6;
 
@@ -39,14 +45,16 @@
   --color-gold-800: #997300;
   --color-gold-900: #806000;
   --color-gold-950: #4D3A00;
+  --color-ring: var(--color-primary);
 
   --fa-style-family-classic: "Font Awesome 6 Free";
 }
 
 @layer base {
   * {
-     @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-text-primary;
     font-synthesis: none;
