@@ -26,6 +26,10 @@ interface PaymentSlipModalProps {
 export function PaymentSlipModal({ student, isOpen, onClose }: PaymentSlipModalProps) {
   const [pricePerSession, setPricePerSession] = useState(200000);
   const [month] = useState('Tháng 3');
+  const [notes, setNotes] = useState(`Con học về chủ đề: "Các con vật - Animals".
+- Con nắm được từ vựng, có thể đọc, viết và sử dụng từ được học vào giao tiếp.
+- Có thể miêu tả khả năng của các con vật. VD: A cat can walk. (Con mèo có thể đi).
+- Trên lớp con ngoan, luôn năng nổ tham gia vào các hoạt động của lớp.`);
 
   const attendanceDates = useMemo(() => {
     if (!student) return [];
@@ -35,19 +39,19 @@ export function PaymentSlipModal({ student, isOpen, onClose }: PaymentSlipModalP
       .sort();
   }, [student]);
 
-  const numSessions = attendanceDates.length;
+  const numSessions = student?.sessionsAttended ?? attendanceDates.length;
   const totalFee = numSessions * pricePerSession;
-
-  const presetNotes = `Con học về chủ đề: "Các con vật - Animals".
-- Con nắm được từ vựng, có thể đọc, viết và sử dụng từ được học vào giao tiếp.
-- Có thể miêu tả khả năng của các con vật. VD: A cat can walk. (Con mèo có thể đi).
-- Trên lớp con ngoan, luôn năng nổ tham gia vào các hoạt động của lớp.`;
 
   // Reset price when student changes
   React.useEffect(() => {
     if (student?.pricePerSession) {
       setPricePerSession(student.pricePerSession);
     }
+    // Optionally reset notes for each student
+    setNotes(`Con học về chủ đề: "Các con vật - Animals".
+- Con nắm được từ vựng, có thể đọc, viết và sử dụng từ được học vào giao tiếp.
+- Có thể miêu tả khả năng của các con vật. VD: A cat can walk. (Con mèo có thể đi).
+- Trên lớp con ngoan, luôn năng nổ tham gia vào các hoạt động của lớp.`);
   }, [student?.id, student?.pricePerSession]);
 
   const handlePrint = () => {
@@ -153,11 +157,12 @@ export function PaymentSlipModal({ student, isOpen, onClose }: PaymentSlipModalP
             {/* Comments Section */}
             <div className="space-y-1.5">
               <p className="text-center text-[#B45309] text-[10px] font-bold tracking-widest">--- NHẬN XÉT ---</p>
-              <div className="bg-[#FEFCE8] border border-[#FEF9C3] rounded-xl p-3 text-[11px] text-[#451A03] leading-[1.5] shadow-sm">
-                {presetNotes.split('\n').map((line, i) => (
-                  <p key={i} className={cn(i > 0 && line.startsWith('-') ? "mt-0.5" : i > 0 ? "mt-1" : "")}>{line}</p>
-                ))}
-              </div>
+              <Textarea 
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="bg-[#FEFCE8] border border-[#FEF9C3] rounded-xl p-3 text-[11px] text-[#451A03] leading-[1.5] shadow-sm min-h-[120px] resize-none focus:ring-1 focus:ring-amber-200 outline-none"
+                placeholder="Nhập nhận xét cho học sinh..."
+              />
             </div>
           </div>
         </div>

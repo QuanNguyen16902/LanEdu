@@ -50,7 +50,7 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
                 className={cn(
                   "w-full text-left pl-11 pr-4 py-1.5 text-[13px] font-medium transition-all border-l-2",
                   isClassActive
-                    ? "text-gray-900 bg-gray-50 border-[#E6B800]"
+                    ? "text-gold-700 bg-gold-50/50 border-gold-500"
                     : "text-gray-500 hover:text-gray-800 border-transparent hover:bg-gray-50/50"
                 )}
               >
@@ -64,7 +64,7 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
                 className={cn(
                   "w-full text-left pl-11 pr-4 py-1.5 text-[13px] font-medium transition-all border-l-2",
                   isAttendanceActive
-                    ? "text-gray-900 bg-gray-50 border-[#E6B800]"
+                    ? "text-gold-700 bg-gold-50/50 border-gold-500"
                     : "text-gray-500 hover:text-gray-800 border-transparent hover:bg-gray-50/50"
                 )}
               >
@@ -97,11 +97,11 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
             className={cn(
               "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
               activeMenu === 'hoc-phi' || currentPath === '/payments'
-                ? "text-gray-900 bg-gray-50 border-[#E6B800]"
+                ? "text-gold-700 bg-gold-50/50 border-gold-500"
                 : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
             )}
           >
-            <Receipt className={cn("w-4 h-4", (activeMenu === 'hoc-phi' || currentPath === '/payments') ? "text-gray-900" : "text-gray-400")} />
+            <Receipt className={cn("w-4 h-4", (activeMenu === 'hoc-phi' || currentPath === '/payments') ? "text-gold-600" : "text-gray-400")} />
             Học phí
           </button>
 
@@ -115,11 +115,11 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
             className={cn(
               "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
               activeMenu === 'lich-hoc' || currentPath === '/schedule'
-                ? "text-gray-900 bg-gray-50 border-[#E6B800]"
+                ? "text-gold-700 bg-gold-50/50 border-gold-500"
                 : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
             )}
           >
-            <CalendarDays className={cn("w-4 h-4", (activeMenu === 'lich-hoc' || currentPath === '/schedule') ? "text-gray-900" : "text-gray-400")} />
+            <CalendarDays className={cn("w-4 h-4", (activeMenu === 'lich-hoc' || currentPath === '/schedule') ? "text-gold-600" : "text-gray-400")} />
             Lịch học
           </button>
 
@@ -131,11 +131,11 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
             className={cn(
               "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
               activeMenu === 'bai-tap' || currentPath === '/management/assignments'
-                ? "text-gray-900 bg-gray-50 border-[#E6B800]"
+                ? "text-gold-700 bg-gold-50/50 border-gold-500"
                 : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
             )}
           >
-            <FileText className={cn("w-4 h-4", (activeMenu === 'bai-tap' || currentPath === '/management/assignments') ? "text-gray-900" : "text-gray-400")} />
+            <FileText className={cn("w-4 h-4", (activeMenu === 'bai-tap' || currentPath === '/management/assignments') ? "text-gold-600" : "text-gray-400")} />
             Bài tập
           </button>
         </nav>
