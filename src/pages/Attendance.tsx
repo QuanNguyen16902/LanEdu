@@ -40,6 +40,31 @@ const CLASSES_TREE = [
   }
 ];
 
+interface NavItemProps {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  key?: string | number;
+}
+
+function NavItem({ label, isActive, onClick, key }: NavItemProps) {
+  return (
+    <button
+      key={key}
+      onClick={onClick}
+      className={cn(
+        "w-full text-left px-3 py-1.5 text-[11px] rounded-md transition-all flex items-center justify-between",
+        isActive 
+          ? "bg-gold-50 text-gold-700 font-bold" 
+          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+      )}
+    >
+      {label}
+      {isActive && <CheckCircle className="w-3 h-3 text-gold-500" />}
+    </button>
+  );
+}
+
 export default function AttendancePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -189,22 +214,15 @@ export default function AttendancePage() {
                       <div key={group.id} className="px-2 mb-2">
                         <div className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.name}</div>
                         {group.children.map(cls => (
-                          <button
+                          <NavItem
                             key={cls.id}
+                            label={cls.name}
+                            isActive={selectedClass === cls.id}
                             onClick={() => {
                               setSelectedClass(cls.id);
                               setIsClassMenuOpen(false);
                             }}
-                            className={cn(
-                              "w-full text-left px-3 py-1.5 text-[11px] rounded-md transition-all flex items-center justify-between",
-                              selectedClass === cls.id 
-                                ? "bg-gold-50 text-gold-700 font-bold" 
-                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                            )}
-                          >
-                            {cls.name}
-                            {selectedClass === cls.id && <CheckCircle className="w-3 h-3 text-gold-500" />}
-                          </button>
+                          />
                         ))}
                       </div>
                     ))}

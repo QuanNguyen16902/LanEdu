@@ -14,7 +14,8 @@ import {
   TrendingUp,
   Target,
   Flame,
-  Trophy
+  Trophy,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -147,6 +148,53 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* QUICK ATTENDANCE SECTION */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-4 bg-gold-500 rounded-full" />
+          <h2 className="text-sm font-bold text-gray-800 uppercase tracking-tight">Cần điểm danh hôm nay</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {mockSchedules.slice(1, 4).map((cls, idx) => (
+            <Card key={cls.id} className="border-none shadow-[0_4px_20px_rgba(0,0,0,0.05)] bg-white rounded-xl overflow-hidden group hover:translate-y-[-2px] transition-all duration-300">
+              <CardContent className="p-0">
+                <div className="flex">
+                  <div className={cn(
+                    "w-2 transition-all duration-300",
+                    idx === 0 ? "bg-amber-500" : "bg-gold-400"
+                  )} />
+                  <div className="flex-1 p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900 leading-none">Lớp {cls.class}</h3>
+                        <p className="text-[11px] text-gray-400 mt-1.5 font-medium italic">{cls.subject}</p>
+                      </div>
+                      <Badge className="bg-amber-50 text-amber-600 border-none font-bold text-[9px] px-2 h-4">
+                        CHƯA ĐIỂM DANH
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between mt-6 pt-3 border-t border-gray-50">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="text-[11px] font-bold text-gray-600">{cls.time.split(' - ')[0]}</span>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        onClick={() => window.location.href = `/classes?class=${cls.class}&tab=attendance`}
+                        className="h-7 px-4 text-[10px] font-black bg-[#E6B800] hover:bg-gold-600 text-white rounded-full border-none shadow-md shadow-gold-500/10 gap-1.5 group/btn transition-all"
+                      >
+                        ĐIỂM DANH NGAY
+                        <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

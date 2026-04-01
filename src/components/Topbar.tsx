@@ -10,13 +10,16 @@ import {
   BookOpenText,
   User,
   ChevronDown,
-  CalendarDays
+  CalendarDays,
+  CalendarCheck
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './Logo';
 import { Badge } from './ui/Badge';
+import { QuickAttendanceModal } from './QuickAttendanceModal';
+import { Button } from './ui/Button';
 
 export function Topbar() {
   const { t } = useTranslation();
@@ -24,6 +27,7 @@ export function Topbar() {
   const location = useLocation();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const [isQuickAttendanceOpen, setIsQuickAttendanceOpen] = React.useState(false);
 
   const currentDate = new Date().toLocaleDateString('vi-VN', { 
     weekday: 'long', 
@@ -35,7 +39,7 @@ export function Topbar() {
   const menuItems = [
     { icon: Home, label: 'Trang chủ', path: '/', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
     { icon: LayoutGrid, label: 'Quản lý học sinh', path: '/classes', roles: ['ADMIN', 'TEACHER'] },
-    { icon: BookOpenText, label: 'Bài Đăng', path: '/assignments', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
+    // { icon: BookOpenText, label: 'Bài Đăng', path: '/assignments', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
   ];
 
   const filteredItems = menuItems.filter(item => item.roles.includes(user?.role || ''));
@@ -81,6 +85,15 @@ export function Topbar() {
         </div>
 
         <div className="flex items-center gap-4">
+          
+          <Button 
+            size="sm"
+            onClick={() => setIsQuickAttendanceOpen(true)}
+            className="hidden md:flex h-8 bg-blue-500 hover:bg-primary-600 text-white text-[11px] font-bold px-3 rounded-lg border-none shadow-sm gap-2 active:scale-95 transition-all"
+          >
+            <CalendarCheck className="w-4 h-4" />
+            Điểm danh nhanh
+          </Button>
           <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-gray-500">
             <CalendarDays className="w-3.5 h-3.5 text-gold-600" />
             <span className="text-[11px] font-bold tracking-tight">
@@ -91,6 +104,7 @@ export function Topbar() {
           <div className="hidden sm:flex items-center pr-1 border-r border-gray-100">
             <LanguageSwitcher />
           </div>
+
 
           <div className="relative">
             <button
@@ -169,9 +183,20 @@ export function Topbar() {
                 </NavLink>
               );
             })}
+            <button
+              onClick={() => { setIsQuickAttendanceOpen(true); setIsOpen(false); }}
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-bold text-gold-700 bg-gold-50 border border-gold-100 mt-4 transition-all"
+            >
+              <CalendarCheck className="w-5 h-5 text-gold-600" />
+              Điểm danh nhanh hàng ngày
+            </button>
           </div>
         </div>
       )}
+      <QuickAttendanceModal 
+        isOpen={isQuickAttendanceOpen} 
+        onClose={() => setIsQuickAttendanceOpen(false)} 
+      />
     </header>
   );
 }

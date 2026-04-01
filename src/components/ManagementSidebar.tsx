@@ -1,7 +1,6 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, NavLink } from 'react-router-dom';
 import {
-  Users,
   Library,
   Receipt,
   CalendarDays,
@@ -20,8 +19,44 @@ interface ManagementSidebarProps {
   onMenuChange: (menu: string) => void;
 }
 
+interface NavItemProps {
+  to: string;
+  icon?: React.ElementType;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  isSubItem?: boolean;
+}
+
+function NavItem({ to, icon: Icon, label, isActive, onClick, isSubItem }: NavItemProps) {
+  return (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      className={cn(
+        "w-full flex items-center transition-all border-l-2",
+        isSubItem 
+          ? "pl-11 pr-4 py-1.5 text-[13px] font-medium" 
+          : "px-4 py-2 text-[13px] font-medium gap-2.5",
+        isActive
+          ? "text-gold-700 bg-gold-50/50 border-gold-500"
+          : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
+      )}
+    >
+      {Icon && (
+        <Icon 
+          className={cn(
+            "w-4 h-4", 
+            isActive ? "text-gold-600" : "text-gray-400"
+          )} 
+        />
+      )}
+      <span>{label}</span>
+    </NavLink>
+  );
+}
+
 export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSidebarProps) {
-  const navigate = useNavigate();
   const location = useLocation();
 
   const currentPath = location.pathname;
@@ -42,102 +77,39 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
               <ChevronRight className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-90" />
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-0.5 mt-0.5">
-              <button
-                onClick={() => {
-                  onMenuChange('danh-sach-lop');
-                  navigate('/classes');
-                }}
-                className={cn(
-                  "w-full text-left pl-11 pr-4 py-1.5 text-[13px] font-medium transition-all border-l-2",
-                  isClassActive
-                    ? "text-gold-700 bg-gold-50/50 border-gold-500"
-                    : "text-gray-500 hover:text-gray-800 border-transparent hover:bg-gray-50/50"
-                )}
-              >
-                Danh sách
-              </button>
-              <button
-                onClick={() => {
-                  onMenuChange('diem-danh');
-                  navigate('/attendance');
-                }}
-                className={cn(
-                  "w-full text-left pl-11 pr-4 py-1.5 text-[13px] font-medium transition-all border-l-2",
-                  isAttendanceActive
-                    ? "text-gold-700 bg-gold-50/50 border-gold-500"
-                    : "text-gray-500 hover:text-gray-800 border-transparent hover:bg-gray-50/50"
-                )}
-              >
-                Điểm danh
-              </button>
+              <NavItem
+                to="/classes"
+                label="Danh sách"
+                isActive={isClassActive}
+                isSubItem
+                onClick={() => onMenuChange('danh-sach-lop')}
+              />
+              <NavItem
+                to="/attendance"
+                label="Điểm danh"
+                isActive={isAttendanceActive}
+                isSubItem
+                onClick={() => onMenuChange('diem-danh')}
+              />
             </CollapsibleContent>
           </Collapsible>
-          {/* 
-          <button
-            onClick={() => {
-              onMenuChange('hoc-sinh');
-              navigate('/classes?view=hoc-sinh');
-            }}
-            className={cn(
-              "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
-              activeMenu === 'hoc-sinh'
-                ? "text-gray-900 bg-gray-50 border-[#E6B800]"
-                : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
-            )}
-          >
-            <Users className={cn("w-4 h-4", activeMenu === 'hoc-sinh' ? "text-gray-900" : "text-gray-400")} />
-            Học sinh
-          </button> */}
 
-          <button
-            onClick={() => {
-              onMenuChange('hoc-phi');
-              navigate('/payments');
-            }}
-            className={cn(
-              "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
-              activeMenu === 'hoc-phi' || currentPath === '/payments'
-                ? "text-gold-700 bg-gold-50/50 border-gold-500"
-                : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
-            )}
-          >
-            <Receipt className={cn("w-4 h-4", (activeMenu === 'hoc-phi' || currentPath === '/payments') ? "text-gold-600" : "text-gray-400")} />
-            Học phí
-          </button>
+          <NavItem
+            to="/payments"
+            icon={Receipt}
+            label="Doanh thu"
+            isActive={activeMenu === 'hoc-phi' || currentPath === '/payments'}
+            onClick={() => onMenuChange('hoc-phi')}
+          />
 
+          <NavItem
+            to="/schedule"
+            icon={CalendarDays}
+            label="Lịch học"
+            isActive={activeMenu === 'lich-hoc' || currentPath === '/schedule'}
+            onClick={() => onMenuChange('lich-hoc')}
+          />
 
-
-          <button
-            onClick={() => {
-              onMenuChange('lich-hoc');
-              navigate('/schedule');
-            }}
-            className={cn(
-              "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
-              activeMenu === 'lich-hoc' || currentPath === '/schedule'
-                ? "text-gold-700 bg-gold-50/50 border-gold-500"
-                : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
-            )}
-          >
-            <CalendarDays className={cn("w-4 h-4", (activeMenu === 'lich-hoc' || currentPath === '/schedule') ? "text-gold-600" : "text-gray-400")} />
-            Lịch học
-          </button>
-
-          <button
-            onClick={() => {
-              onMenuChange('bai-tap');
-              navigate('/management/assignments');
-            }}
-            className={cn(
-              "w-full flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-all border-l-2",
-              activeMenu === 'bai-tap' || currentPath === '/management/assignments'
-                ? "text-gold-700 bg-gold-50/50 border-gold-500"
-                : "text-gray-600 hover:text-gray-900 border-transparent hover:bg-gray-50"
-            )}
-          >
-            <FileText className={cn("w-4 h-4", (activeMenu === 'bai-tap' || currentPath === '/management/assignments') ? "text-gold-600" : "text-gray-400")} />
-            Bài tập
-          </button>
         </nav>
       </div>
     </div>

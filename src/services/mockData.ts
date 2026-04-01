@@ -34,6 +34,7 @@ export interface AttendanceRecord {
   date: string;
   status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED' | 'UNEXCUSED';
   classId: string;
+  isPaid?: boolean;
 }
 
 export interface Evaluation {

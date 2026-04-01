@@ -1,23 +1,25 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  Users,
   Plus,
   Search,
   Folder,
   ChevronRight,
-  Download,
-  MoreHorizontal,
-  Receipt,
-  UserCheck,
-  Eye,
-  MoreVertical,
-  Filter,
   RefreshCw,
-  Edit2,
   Calendar,
   CheckCircle,
-  Layout
+  GripVertical,
+  Trash2,
+  MoreVertical,
+  Printer,
+  UserPlus,
+  FileDown,
+  ChevronDown,
+  Receipt,
+  CreditCard,
+  AlertCircle,
+  TrendingUp,
+  Filter
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -48,8 +50,12 @@ import {
 import { PaymentSlipModal } from '@/components/PaymentSlipModal';
 import { Student, mockAttendance, mockStudents } from '@/services/mockData';
 import { ManagementSidebar } from '@/components/ManagementSidebar';
+import { ClassStudentsTab } from './class-management/ClassStudentsTab';
+import { ClassAttendanceTab } from './class-management/ClassAttendanceTab';
+import { ClassTuitionTab, TuitionDetailPanel } from './class-management/ClassTuitionTab';
+import { AttendanceDetailsModal } from './class-management/AttendanceDetailsModal';
+import { EditStudentModal } from './class-management/EditStudentModal';
 
-// CLASSES_TREE is kept here as it's UI specific for the sidebar
 const CLASSES_TREE = [
   {
     id: 'k6',
@@ -58,7 +64,7 @@ const CLASSES_TREE = [
       { id: '6a1', name: '6 Moon' },
       { id: '6a2', name: '6 Star' },
       { id: '6a3', name: '6 Galaxy' },
-    ]
+    ],
   },
   {
     id: 'k7',
@@ -66,95 +72,200 @@ const CLASSES_TREE = [
     children: [
       { id: '7a1', name: '7 Sun' },
       { id: '7a2', name: '7 Venus' },
-    ]
-  }
+    ],
+  },
 ];
 
+export interface PaymentRecord {
+  id: string;
+  studentId: string;
+  studentName: string;
+  class: string;
+  month: string;
+  amount: number;
+  method: string;
+  note: string;
+  createdAt: string;
+}
+
+const METHOD_LABELS: Record<string, string> = {
+  cash: 'Tiền mặt',
+  tpbank: 'TPBank',
+  techcom: 'Techcombank',
+  bidv: 'BIDV',
+  mbbank: 'MB Bank',
+  agribank: 'Agribank',
+  vietcom: 'Vietcombank',
+  vnpay: 'VNPay',
+};
+
+const INITIAL_PAYMENT_RECORDS: PaymentRecord[] = [
+  { id: 'PAY-001', studentId: 'ED0119310177', studentName: 'Bùi Anujin Thúy An', class: '7a1', month: '03/2026', amount: 1600000, method: 'tpbank', note: '', createdAt: '15/03/2026' },
+  { id: 'PAY-002', studentId: 'ED0119310031', studentName: 'Trần Quý Phương An', class: '7a1', month: '03/2026', amount: 1600000, method: 'cash', note: 'Phụ huynh nộp trực tiếp', createdAt: '18/03/2026' },
+];
+
+type ActiveTab = 'list' | 'attendance' | 'payments';
+
 export default function ClassManagementPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeMenu, setActiveMenu] = useState('danh-sach-lop');
-  const [selectedClass, setSelectedClass] = useState<string | null>(searchParams.get('class') || '7a1');
+  const [selectedClass, setSelectedClass] = useState<string | null>(searchParams.get('class'));
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedStudentForSlip, setSelectedStudentForSlip] = useState<Student | null>(null);
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [students, setStudents] = useState<Student[]>(mockStudents);
-  const [editingStudentIds, setEditingStudentIds] = useState<Set<string>>(new Set());
+  const [editingStudentIds] = useState<Set<string>>(new Set());
 
-  // Tabs Union State
-  const [activeTab, setActiveTab] = useState<'list' | 'attendance'>(() => {
-    return (sessionStorage.getItem('classManagementTab') as 'list' | 'attendance') || 'list';
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    return (sessionStorage.getItem('classManagementTab') as ActiveTab) || 'attendance';
   });
-  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
-  const [records, setRecords] = useState(mockAttendance);
 
   React.useEffect(() => {
     sessionStorage.setItem('classManagementTab', activeTab);
   }, [activeTab]);
 
+  // Attendance state
+  const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [records, setRecords] = useState(mockAttendance);
+
+  // Payment state
+  const [selectedMonth, setSelectedMonth] = useState('2026-03');
+  const [fromDate, setFromDate] = useState('2026-03-01');
+  const [toDate, setToDate] = useState('2026-03-31');
+  const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>(INITIAL_PAYMENT_RECORDS);
+  const [paidStudentIds, setPaidStudentIds] = useState<Set<string>>(
+    new Set(INITIAL_PAYMENT_RECORDS.map(r => r.studentId))
+  );
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedStudentForPayment, setSelectedStudentForPayment] = useState<Student | null>(null);
+
+  // Detail Panel
+  const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
+  const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
+
+  const openDetailPanel = (student: Student) => {
+    setSelectedStudentForDetail(student);
+    setIsDetailPanelOpen(true);
+  };
+
+  React.useEffect(() => {
+    if (!selectedMonth) return;
+    const [year, month] = selectedMonth.split('-').map(Number);
+    // Correctly get 1st and last day of the month
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    
+    // Formatting as YYYY-MM-DD for <input type="date">
+    const format = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+
+    setFromDate(format(firstDay));
+    setToDate(format(lastDay));
+  }, [selectedMonth]);
+
+  // Selection action dropdown
+  const [isActionOpen, setIsActionOpen] = useState(false);
+
+  const [isAttendanceDetailsOpen, setIsAttendanceDetailsOpen] = useState(false);
+  const [viewingAttendanceStudent, setViewingAttendanceStudent] = useState<any>(null);
+
+  // Edit student state
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+
+  const openAttendanceDetails = (student: Student) => {
+    setViewingAttendanceStudent(student);
+    setIsAttendanceDetailsOpen(true);
+  };
+
+  const openEditModal = (student: Student) => {
+    setEditingStudent(student);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSave = (updatedStudent: Student) => {
+    setStudents(prev => prev.map(s => s.id === updatedStudent.id ? updatedStudent : s));
+  };
+
   const filteredStudents = useMemo(() => {
+    if (!selectedClass) return [];
     return students.filter(s => {
-      const matchesClass = !selectedClass || s.class.toLowerCase() === selectedClass.toLowerCase();
-      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.id.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesClass = s.class.toLowerCase() === selectedClass.toLowerCase();
+      const matchesSearch =
+        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.id.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesClass && matchesSearch;
     });
   }, [selectedClass, searchQuery, students]);
 
-  const handleStatusChange = (studentId: string, status: any) => {
+  const filteredPaymentRecords = useMemo(() => {
+    if (!selectedClass) return [];
+    return paymentRecords.filter(r => 
+      r.class.toLowerCase() === selectedClass.toLowerCase() && 
+      r.month === (selectedMonth.split('-').reverse().join('/'))
+    );
+  }, [paymentRecords, selectedClass, selectedMonth]);
+
+  const currentStats = useMemo(() => {
+    const day = records.filter(r => r.date === attendanceDate && (!selectedClass || r.classId === selectedClass));
+    return {
+      present: day.filter(r => r.status === 'PRESENT').length,
+      late: day.filter(r => r.status === 'LATE').length,
+      absent: day.filter(r => r.status === 'ABSENT').length,
+      total: filteredStudents.length,
+    };
+  }, [records, attendanceDate, selectedClass, filteredStudents]);
+  // ── Handlers ──────────────────────────────────────────────
+  const handleStatusChange = (studentId: string, status: string) => {
     setRecords(prev => {
-      const existingIndex = prev.findIndex(r => r.studentId === studentId && r.date === attendanceDate);
-      if (existingIndex >= 0) {
-        const newRecords = [...prev];
-        newRecords[existingIndex] = { ...newRecords[existingIndex], status };
-        return newRecords;
+      const idx = prev.findIndex(r => r.studentId === studentId && r.date === attendanceDate);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], status: status as any };
+        return next;
       }
-      return [...prev, {
-        id: `att-${Date.now()}-${studentId}`,
-        studentId,
-        date: attendanceDate,
-        status,
-        classId: selectedClass || ''
-      }];
+      return [...prev, { id: `att-${Date.now()}-${studentId}`, studentId, date: attendanceDate, status: status as any, classId: selectedClass || '' }];
     });
   };
 
   const markAllPresent = () => {
-    const newRecords = [...records];
-    filteredStudents.forEach(student => {
-      const existingIndex = newRecords.findIndex(r => r.studentId === student.id && r.date === attendanceDate);
-      if (existingIndex >= 0) {
-        newRecords[existingIndex] = { ...newRecords[existingIndex], status: 'PRESENT' };
+    const next = [...records];
+    filteredStudents.forEach(s => {
+      const idx = next.findIndex(r => r.studentId === s.id && r.date === attendanceDate);
+      if (idx >= 0) {
+        next[idx] = { ...next[idx], status: 'PRESENT' };
       } else {
-        newRecords.push({
-          id: `att-${Date.now()}-${student.id}`,
-          studentId: student.id,
-          date: attendanceDate,
-          status: 'PRESENT',
-          classId: selectedClass || ''
-        });
+        next.push({ id: `att-${Date.now()}-${s.id}`, studentId: s.id, date: attendanceDate, status: 'PRESENT', classId: selectedClass || '' });
       }
     });
-    setRecords(newRecords);
-    toast.success("Đã đánh dấu tất cả có mặt");
+    setRecords(next);
+    toast.success('Đã đánh dấu tất cả có mặt');
   };
 
-  const currentStats = useMemo(() => {
-    const dayRecords = records.filter(r => r.date === attendanceDate && (!selectedClass || r.classId === selectedClass));
-    return {
-      present: dayRecords.filter(r => r.status === 'PRESENT').length,
-      late: dayRecords.filter(r => r.status === 'LATE').length,
-      absent: dayRecords.filter(r => r.status === 'ABSENT').length,
-      total: filteredStudents.length
-    };
-  }, [records, attendanceDate, selectedClass, filteredStudents]);
+  const getSessionsCount = useCallback((studentId: string) => {
+    return records.filter(a => 
+      a.studentId === studentId && 
+      a.status === 'PRESENT' && 
+      a.date >= fromDate && 
+      a.date <= toDate
+    ).length;
+  }, [records, fromDate, toDate]);
+
+  const getTotalUnpaidSessions = useCallback((studentId: string) => {
+    return records.filter(a => 
+      a.studentId === studentId && 
+      a.status === 'PRESENT' && 
+      !a.isPaid
+    ).length;
+  }, [records]);
 
   const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
+    const next = new Set(selectedRows);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setSelectedRows(next);
   };
 
   const toggleAll = () => {
@@ -162,42 +273,68 @@ export default function ClassManagementPage() {
     else setSelectedRows(new Set(filteredStudents.map(s => s.id)));
   };
 
-   // Helper to count sessions
-  const getSessionsCount = (studentId: string, monthPrefix?: string) => {
-    return records.filter(a => 
-      a.studentId === studentId && 
-      a.status === 'PRESENT' && 
-      (!monthPrefix || a.date.startsWith(monthPrefix))
-    ).length;
-  };
-
-  const [isAttendanceDetailsOpen, setIsAttendanceDetailsOpen] = useState(false);
-  const [viewingAttendanceStudent, setViewingAttendanceStudent] = useState<any>(null);
-
-  const handleCreatePaymentSlip = (student: any) => {
-    const mappedStudent: Student = {
+  const openPaymentModal = (student: Student) => {
+    const unpaidRecords = records.filter(a => a.studentId === student.id && a.status === 'PRESENT' && !a.isPaid);
+    setSelectedStudentForPayment({
       ...student,
-      id: student.id,
-      name: student.name,
       email: `${student.id}@school.com`,
-      class: student.class,
       attendance: 100,
       score: 10,
-      pricePerSession: student.pricePerSession,
-      sessionsAttended: getSessionsCount(student.id, '2026-03') // Dynamic for March
-    };
-    setSelectedStudentForSlip(mappedStudent);
+      sessionsAttended: unpaidRecords.length,
+    });
     setIsPaymentModalOpen(true);
   };
 
-  const handlePriceChange = (id: string, newPrice: number) => {
-    setStudents(prev => prev.map(s => s.id === id ? { ...s, pricePerSession: newPrice } : s));
+  const handlePaymentSave = (data: { amount: number; method: string; note: string }) => {
+    if (!selectedStudentForPayment) return;
+    const formattedMonth = selectedMonth.split('-').reverse().join('/');
+    
+    // Create payment record
+    const rec: PaymentRecord = {
+      id: `PAY-${Date.now()}`,
+      studentId: selectedStudentForPayment.id,
+      studentName: selectedStudentForPayment.name,
+      class: selectedStudentForPayment.class,
+      month: formattedMonth,
+      amount: data.amount,
+      method: data.method,
+      note: data.note,
+      createdAt: new Date().toLocaleDateString('vi-VN'),
+    };
+    
+    // Mark sessions as paid (Mock - mark all current unpaid as paid for this student)
+    setRecords(prev => prev.map(r => 
+      r.studentId === selectedStudentForPayment.id && r.status === 'PRESENT' 
+        ? { ...r, isPaid: true } 
+        : r
+    ));
+
+    setPaymentRecords(prev => [rec, ...prev]);
+    toast.success(`Đã thu học phí cho ${selectedStudentForPayment.name}!`);
   };
+
+  const handleDeletePaymentRecord = (id: string) => {
+    setPaymentRecords(prev => {
+      const updated = prev.filter(r => r.id !== id);
+      // Recompute paidStudentIds from remaining records
+      setPaidStudentIds(new Set(updated.map(r => r.studentId)));
+      return updated;
+    });
+    toast.success('Đã xóa phiếu thu');
+  };
+
+  const paymentStats = useMemo(() => {
+    const cls = students.filter(s => !selectedClass || s.class === selectedClass);
+    const paid = cls.filter(s => paidStudentIds.has(s.id)).length;
+    const totalAmount = filteredPaymentRecords.reduce((sum, r) => sum + r.amount, 0);
+    return { total: cls.length, paid, pending: cls.length - paid, totalAmount };
+  }, [students, selectedClass, paidStudentIds, filteredPaymentRecords]);
 
   return (
     <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-[#F8FAFC]">
       <ManagementSidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
 
+      {/* Class tree sidebar */}
       <div className="w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0">
         <div className="p-3 border-b border-gray-100">
           <Button size="sm" className="w-full h-8 bg-[#E6B800] hover:bg-gold-600 font-medium text-xs text-white rounded-md gap-2 shadow-sm border-none">
@@ -207,7 +344,7 @@ export default function ClassManagementPage() {
         </div>
         <ScrollArea className="flex-1">
           <div className="py-2 space-y-0.5">
-            {CLASSES_TREE.map((group) => (
+            {CLASSES_TREE.map(group => (
               <Collapsible key={group.id} defaultOpen tabIndex={-1}>
                 <CollapsibleTrigger className="flex items-center gap-1.5 w-full px-3 py-1.5 text-[12px] font-medium text-gray-800 hover:bg-gray-50 transition-all group outline-none">
                   <ChevronRight className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-90" />
@@ -215,15 +352,15 @@ export default function ClassManagementPage() {
                   {group.name}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-0.5">
-                  {group.children.map((cls) => (
+                  {group.children.map(cls => (
                     <button
                       key={cls.id}
                       onClick={() => setSelectedClass(cls.id)}
                       className={cn(
-                        "flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-[12px] font-normal transition-all border-l-2 outline-none",
+                        'flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-[12px] font-normal transition-all border-l-2 outline-none',
                         selectedClass === cls.id
-                          ? "text-gold-700 border-gold-500 bg-gold-50/50"
-                          : "text-gray-500 border-transparent hover:text-gray-800 hover:bg-gray-50"
+                          ? 'text-gold-700 border-gold-500 bg-gold-50/50'
+                          : 'text-gray-500 border-transparent hover:text-gray-800 hover:bg-gray-50'
                       )}
                     >
                       {cls.name}
@@ -236,450 +373,172 @@ export default function ClassManagementPage() {
         </ScrollArea>
       </div>
 
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 bg-white m-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden py-2">
-        <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
-          <div>
-            <h1 className="text-base font-semibold text-gray-900 leading-tight">
-              Lớp {selectedClass}
+
+        {/* Header with tabs */}
+        <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold text-gray-800 leading-tight">
+              Danh sách học sinh - {selectedClass || ''}
             </h1>
-            <div className="flex items-center gap-4 mt-1">
-               <button 
-                onClick={() => setActiveTab('list')}
-                className={cn(
-                  "text-[12px] font-bold pb-1.5 border-b-2 transition-all",
-                  activeTab === 'list' ? "text-gold-600 border-gold-500" : "text-gray-400 border-transparent hover:text-gray-600"
-                )}
-               >
-                 Danh sách học sinh
-               </button>
-               <button 
-                onClick={() => setActiveTab('attendance')}
-                className={cn(
-                  "text-[12px] font-bold pb-1.5 border-b-2 transition-all",
-                  activeTab === 'attendance' ? "text-gold-600 border-gold-500" : "text-gray-400 border-transparent hover:text-gray-600"
-                )}
-               >
-                 Điểm danh hàng ngày
-               </button>
-            </div>
+            <p className="text-[10px] text-gray-400 font-medium">Tổng số: {selectedClass ? filteredStudents.length : 0}</p>
           </div>
+
           <div className="flex items-center gap-2">
-            <p className="text-[11px] text-gray-400 font-medium mr-2">
-              {activeTab === 'list' ? `Tổng số: ${filteredStudents.length}` : `Sĩ số: ${filteredStudents.length}`}
-            </p>
-            <Button variant="outline" size="sm" className="h-6 px-3 text-[11px] font-medium border-gray-200 bg-white gap-2 shadow-none transition-all">
-              <RefreshCw className="w-3.5 h-3.5" />
-              Tải lại
-            </Button>
-            <Button variant="outline" size="sm" className="h-6 px-3 text-[11px] font-medium border-gray-200 bg-white gap-2 shadow-none transition-all">
-              <Filter className="w-3.5 h-3.5" />
-              Bộ lọc
-            </Button>
-            <div className="h-4 w-px bg-gray-200 mx-1" />
-            <div className="relative">
-               <Button
-                size="sm"
-                className="h-6 px-4 bg-[#1E40AF] hover:bg-blue-900 text-white font-medium text-xs rounded-md shadow-sm border-none gap-2 transition-all"
-                onClick={() => setIsActionsOpen(!isActionsOpen)}
-              >
-                Thao tác
-                <ChevronRight className={cn("w-3 h-3 transition-transform", isActionsOpen ? "rotate-[270deg]" : "rotate-90")} />
+            <div className="flex items-center gap-1.5 mr-2">
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] font-semibold border-gray-200 bg-white gap-2 shadow-none rounded-md text-gray-600">
+                <RefreshCw className="w-3.5 h-3.5" />
+                Refresh
               </Button>
-
-              {isActionsOpen && (
-                <>
-                  <div className="fixed inset-0 z-20" onClick={() => setIsActionsOpen(false)} />
-                  <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-30 py-1 overflow-hidden">
-                    <button
-                      className="w-full text-left px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                      onClick={() => {
-                        if (selectedRows.size === 0) {
-                          toast.warning('Vui lòng chọn học sinh để tạo học phí');
-                          return;
-                        }
-                        const firstSelectedId = Array.from(selectedRows)[0];
-                        const student = students.find(s => s.id === firstSelectedId) || filteredStudents[0];
-                        if (student) handleCreatePaymentSlip(student);
-                        setIsActionsOpen(false);
-                      }}
-                    >
-                      <Receipt className="w-3.5 h-3.5 text-gray-400" />
-                      Tạo học phí
-                    </button>
-                    <button
-                      className="w-full text-left px-3 py-2 text-[12px] text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-t border-gray-50"
-                      onClick={() => {
-                        if (selectedRows.size === 0) {
-                          toast.warning('Vui lòng chọn học sinh để sửa');
-                          return;
-                        }
-                        const newEditing = new Set(editingStudentIds);
-                        selectedRows.forEach(id => newEditing.add(id));
-                        setEditingStudentIds(newEditing);
-                        setIsActionsOpen(false);
-                      }}
-                    >
-                      <Edit2 className="w-3.5 h-3.5 text-gray-400" />
-                      Sửa
-                    </button>
-                  </div>
-                </>
-              )}
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] font-semibold border-gray-200 bg-white gap-2 shadow-none rounded-md text-gray-600">
+                <Filter className="w-3.5 h-3.5" />
+                Bộ lọc
+                <ChevronDown className="w-3 h-3 text-gray-400" />
+              </Button>
             </div>
+            
+            <Collapsible open={isActionOpen} onOpenChange={setIsActionOpen} className="relative">
+              <CollapsibleTrigger asChild>
+                <Button size="sm" className="h-8 px-4 text-[11px] font-bold bg-[#1E40AF] hover:bg-blue-800 text-white gap-2 shadow-sm rounded-md border-none">
+                  Thao tác
+                  <ChevronDown className="w-3 h-3 text-white/70" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-xl z-[100] overflow-hidden py-1">
+                {[
+                  { icon: UserPlus, label: 'Thêm học sinh', color: 'text-emerald-600' },
+                  { icon: FileDown, label: 'Xuất CSV', color: 'text-blue-600' },
+                  { icon: Printer, label: 'In danh sách', color: 'text-gray-600' },
+                  { icon: Trash2, label: 'Xóa mục chọn', color: 'text-rose-600' }
+                ].map((action, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => setIsActionOpen(false)}
+                    className="flex items-center gap-3 w-full px-4 py-2.5 text-[12px] text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <action.icon className={cn("w-4 h-4", action.color)} />
+                    {action.label}
+                  </button>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
 
-            <div className="relative ml-2">
+            <div className="relative">
               <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-gray-400" />
               <Input
-                placeholder="Tìm kiếm..."
+                placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-8 w-48 text-[12px] bg-gray-50 border-gray-200 focus:bg-white rounded-md transition-all shadow-none"
+                className="pl-9 h-8 w-44 text-[12px] bg-white border-gray-200 focus:bg-white rounded-md transition-all shadow-none"
               />
             </div>
           </div>
         </div>
 
-        {activeTab === 'attendance' && (
-          <div className="px-4 py-2 bg-gold-50/30 border-b border-gray-200 flex items-center justify-between animate-in slide-in-from-top duration-300">
-            <div className="flex items-center gap-6">
-               <div className="flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                 <span className="text-[11px] font-medium text-gray-600">Có mặt: <b className="text-emerald-700">{currentStats.present}</b></span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                 <span className="text-[11px] font-medium text-gray-600">Đi muộn: <b className="text-amber-700">{currentStats.late}</b></span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
-                 <span className="text-[11px] font-medium text-gray-600">Vắng mặt: <b className="text-rose-700">{currentStats.absent}</b></span>
-               </div>
-               <div className="h-3 w-px bg-gray-200" />
-               <span className="text-[11px] text-gray-400">Tỷ lệ chuyên cần: <b className="text-gray-900">{currentStats.total > 0 ? Math.round((currentStats.present / currentStats.total) * 100) : 0}%</b></span>
-            </div>
-
-            <div className="flex items-center gap-3">
-               <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-md shadow-sm">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                  <input 
-                    type="date" 
-                    value={attendanceDate}
-                    onChange={(e) => setAttendanceDate(e.target.value)}
-                    className="text-[11px] font-bold border-none focus:ring-0 p-0 h-auto outline-none bg-transparent text-gray-700"
-                  />
-               </div>
-               <Button 
-                size="sm" 
-                onClick={markAllPresent}
-                className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-4 rounded-md gap-2 border-none shadow-sm"
-               >
-                 <CheckCircle className="w-3.5 h-3.5" />
-                 Có mặt tất cả
-               </Button>
-            </div>
+        {/* Tab Selection (Subheader) */}
+        <div className="h-10 border-b border-gray-100 flex items-center px-4 shrink-0 bg-white">
+          <div className="flex items-center gap-6">
+            {([
+              ['list', 'Danh sách học sinh'],
+              ['attendance', 'Điểm danh hàng ngày'],
+              ['payments', 'Học phí'],
+            ] as [ActiveTab, string][]).map(([tab, label]) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'text-[12px] font-bold h-full border-b-2 transition-all flex items-center',
+                  activeTab === tab
+                    ? 'text-gold-600 border-gold-500'
+                    : 'text-gray-400 border-transparent hover:text-gray-600'
+                )}
+              >
+                {label}
+                {tab === 'payments' && filteredPaymentRecords.length > 0 && selectedClass && (
+                  <span className="ml-1.5 bg-gold-100 text-gold-700 text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                    {filteredPaymentRecords.length}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
+        </div>
+
+        {/* ── TAB: DANH SÁCH HỌC SINH ─────────────────────────────────── */}
+        {activeTab === 'list' && (
+          <ClassStudentsTab
+            selectedClass={selectedClass}
+            filteredStudents={filteredStudents}
+            searchQuery={searchQuery}
+            selectedRows={selectedRows}
+            toggleRow={toggleRow}
+            toggleAll={toggleAll}
+            onOpenDetails={openAttendanceDetails}
+            onEdit={openEditModal}
+          />
         )}
 
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <Table className="border-collapse table-fixed w-full">
-              <TableHeader className="bg-[#F1F5F9] sticky top-0 z-10 border-b border-gray-300">
-                <TableRow className="h-10 hover:bg-transparent transition-none border-b border-gray-200">
-                  <TableHead className="w-8 px-2 border-r border-gray-200">
-                    <Checkbox checked={selectedRows.size === filteredStudents.length} onCheckedChange={toggleAll} />
-                  </TableHead>
-                  <TableHead className="w-10 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">TT</TableHead>
-                  <TableHead className="w-28 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Trạng thái</TableHead>
-                  <TableHead className="w-28 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Mã học sinh</TableHead>
-                  <TableHead className="w-44 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Họ tên</TableHead>
-                  {activeTab === 'attendance' ? (
-                     <>
-                        <TableHead className="w-[300px] text-center text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Điểm danh</TableHead>
-                        <TableHead className="text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Ghi chú</TableHead>
-                        <TableHead className="w-28 text-center text-[12px] font-medium text-gray-500 px-3">Giờ điểm danh</TableHead>
-                     </>
-                  ) : (
-                     <>
-                        <TableHead className="w-28 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Ngày sinh</TableHead>
-                        <TableHead className="w-24 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200">Giới tính</TableHead>
-                        <TableHead className="w-16 text-[12px] font-medium text-gray-500 px-3 border-r border-gray-200 text-center">Buổi (M)</TableHead>
-                        <TableHead className="w-32 text-right text-[12px] font-medium text-gray-500 px-3">Học phí / buổi</TableHead>
-                     </>
-                  )}
-                </TableRow>
-                <TableRow className="h-8 bg-white border-b border-gray-200">
-                  <TableCell className="border-r border-gray-200"></TableCell>
-                  <TableCell className="border-r border-gray-200"></TableCell>
-                  <TableCell className="px-2 border-r border-gray-200"><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                  <TableCell className="px-2 border-r border-gray-200"><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                  <TableCell className="px-2 border-r border-gray-200"><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                  <TableCell className="px-2 border-r border-gray-200"><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                  <TableCell className="px-2 border-r border-gray-200"><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                  <TableCell className={activeTab === 'attendance' ? "px-2" : "px-2 border-r border-gray-200"}><Search className="w-3 h-3 text-gray-300" /></TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredStudents.map((student, idx) => (
-                  <TableRow key={student.id} className="h-9 hover:bg-gray-50 transition-colors border-b border-gray-200 group">
-                    <TableCell className="px-2 border-r border-gray-200">
-                      <Checkbox checked={selectedRows.has(student.id)} onCheckedChange={() => toggleRow(student.id)} />
-                    </TableCell>
-                    <TableCell className="text-[11px] text-gray-500 px-3 border-r border-gray-200">{idx + 1}</TableCell>
-                    <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">{student.status}</TableCell>
-                    <TableCell className="text-[11px] font-medium text-gray-900 px-3 border-r border-gray-200">{student.id}</TableCell>
-                    <TableCell className="text-[11px] font-semibold text-gray-900 px-3 border-r border-gray-200">{student.name}</TableCell>
-                    
-                    {activeTab === 'attendance' ? (
-                       <>
-                          <TableCell className="px-2 border-r border-gray-200">
-                             {(() => {
-                                const record = records.find(r => r.studentId === student.id && r.date === attendanceDate);
-                                return (
-                                   <div className="flex items-center justify-center gap-1">
-                                      <button
-                                         onClick={() => handleStatusChange(student.id, 'PRESENT')}
-                                         className={cn(
-                                            "flex-1 py-1 px-1 text-[9px] font-bold rounded transition-all border",
-                                            record?.status === 'PRESENT'
-                                               ? "bg-emerald-500 text-white border-emerald-600 shadow-sm"
-                                               : "bg-white text-gray-400 border-gray-100 hover:bg-emerald-50 hover:text-emerald-600"
-                                         )}
-                                      >
-                                         CÓ MẶT
-                                      </button>
-                                      <button
-                                         onClick={() => handleStatusChange(student.id, 'LATE')}
-                                         className={cn(
-                                            "flex-1 py-1 px-1 text-[9px] font-bold rounded transition-all border",
-                                            record?.status === 'LATE'
-                                               ? "bg-amber-500 text-white border-amber-600 shadow-sm"
-                                               : "bg-white text-gray-400 border-gray-100 hover:bg-amber-50 hover:text-amber-600"
-                                         )}
-                                      >
-                                         MUỘN
-                                      </button>
-                                      <button
-                                         onClick={() => handleStatusChange(student.id, 'ABSENT')}
-                                         className={cn(
-                                            "flex-1 py-1 px-1 text-[9px] font-bold rounded transition-all border",
-                                            record?.status === 'ABSENT'
-                                               ? "bg-rose-500 text-white border-rose-600 shadow-sm"
-                                               : "bg-white text-gray-400 border-gray-100 hover:bg-rose-50 hover:text-rose-600"
-                                         )}
-                                      >
-                                         VẮNG
-                                      </button>
-                                   </div>
-                                );
-                             })()}
-                          </TableCell>
-                          <TableCell className="px-3 border-r border-gray-200">
-                             <input 
-                              placeholder="Lý do vắng..." 
-                              className="text-[11px] bg-transparent border-none outline-none w-full text-gray-500 placeholder:text-gray-200 italic"
-                            />
-                          </TableCell>
-                          <TableCell className="text-center text-[10px] text-gray-400 tabular-nums">
-                             {records.some(r => r.studentId === student.id && r.date === attendanceDate) ? "16:40:12" : "--:--:--"}
-                          </TableCell>
-                       </>
-                    ) : (
-                       <>
-                          <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">{student.dob}</TableCell>
-                          <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">{student.gender}</TableCell>
-                          <TableCell className="text-[11px] text-gray-900 font-semibold px-3 border-r border-gray-200 text-center">
-                             <button
-                               onClick={() => {
-                                 setViewingAttendanceStudent(student);
-                                 setIsAttendanceDetailsOpen(true);
-                               }}
-                               className="hover:text-gold-600 hover:underline transition-all"
-                             >
-                               {getSessionsCount(student.id, '2026-03')}
-                             </button>
-                          </TableCell>
-                          <TableCell className="text-[11px] text-gray-900 font-medium px-2 text-right tabular-nums">
-                            <div className="flex items-center gap-1 justify-end h-7">
-                              {editingStudentIds.has(student.id) ? (
-                                <Input
-                                  type="number"
-                                  value={student.pricePerSession}
-                                  onChange={(e) => handlePriceChange(student.id, Number(e.target.value))}
-                                  autoFocus
-                                  className="h-full w-20 text-[11px] font-semibold bg-white border-gray-200 focus:border-[#E6B800] transition-all p-1"
-                                />
-                              ) : (
-                                <span>
-                                  {student.pricePerSession?.toLocaleString('vi-VN')}
-                                </span>
-                              )}
-                              <span className="text-[10px] text-gray-400 ml-1">đ</span>
-                            </div>
-                          </TableCell>
-                       </>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        </div>
+        {/* ── TAB: ĐIỂM DANH ──────────────────────────────────────────── */}
+        {activeTab === 'attendance' && (
+          <ClassAttendanceTab
+            attendanceDate={attendanceDate}
+            setAttendanceDate={setAttendanceDate}
+            currentStats={currentStats}
+            filteredStudents={filteredStudents}
+            records={records}
+            handleStatusChange={handleStatusChange}
+            markAllPresent={markAllPresent}
+            selectedClass={selectedClass}
+            onOpenDetails={openAttendanceDetails}
+          />
+        )}
+
+        {/* ── TAB: HỌC PHÍ ────────────────────────────────────────────── */}
+        {activeTab === 'payments' && (
+          <ClassTuitionTab
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            fromDate={fromDate}
+            setFromDate={setFromDate}
+            toDate={toDate}
+            setToDate={setToDate}
+            paymentStats={paymentStats}
+            filteredStudents={filteredStudents}
+            getTotalUnpaidSessions={getTotalUnpaidSessions}
+            getSessionsCount={getSessionsCount}
+            records={records}
+            openPaymentModal={openPaymentModal}
+            openDetailPanel={openDetailPanel}
+          />
+        )}
+
+        <PaymentSlipModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          student={selectedStudentForPayment}
+          onSave={handlePaymentSave}
+        />
+        <AttendanceDetailsModal
+          isOpen={isAttendanceDetailsOpen}
+          onClose={() => setIsAttendanceDetailsOpen(false)}
+          student={viewingAttendanceStudent}
+        />
+        <TuitionDetailPanel
+          isOpen={isDetailPanelOpen}
+          onClose={() => setIsDetailPanelOpen(false)}
+          student={selectedStudentForDetail}
+          records={records}
+          fromDate={fromDate}
+          toDate={toDate}
+        />
+        <EditStudentModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          student={editingStudent}
+          onSave={handleEditSave}
+        />
       </div>
-
-      <PaymentSlipModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        student={selectedStudentForSlip}
-      />
-
-      <AttendanceDetailsModal
-        isOpen={isAttendanceDetailsOpen}
-        onClose={() => setIsAttendanceDetailsOpen(false)}
-        student={viewingAttendanceStudent}
-      />
     </div>
-  );
-}
-
-function AttendanceDetailsModal({ isOpen, onClose, student }: any) {
-  if (!student) return null;
-
-  // Use March 2026 for demo consistency
-  const currentMonth = "2026-03";
-  const records = mockAttendance.filter(a => a.studentId === student.id && a.date.startsWith(currentMonth));
-  
-  const stats = {
-    present: records.filter(r => r.status === 'PRESENT').length,
-    late: records.filter(r => r.status === 'LATE').length,
-    absent: records.filter(r => r.status === 'ABSENT').length,
-    total: records.length
-  };
-
-  // Simple calendar generation for 03/2026
-  const daysInMonth = 31;
-  const firstDay = new Date(2026, 2, 1).getDay(); // Sunday=0
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[680px] p-0 overflow-hidden bg-white border-none rounded-2xl shadow-2xl">
-        <DialogHeader className="p-5 bg-gradient-to-br from-gold-500 to-amber-600 text-white">
-          <div className="flex justify-between items-start">
-             <div>
-                <DialogTitle className="text-lg font-bold flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Chi tiết điểm danh
-                </DialogTitle>
-                <p className="text-[11px] opacity-90 mt-1 font-medium italic">Học sinh: {student.name} • {student.id}</p>
-             </div>
-             <div className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold backdrop-blur-sm">
-                Tháng 03/2026
-             </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-3 mt-6">
-             <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/10">
-                <p className="text-[9px] uppercase tracking-wider font-bold opacity-80">Có mặt</p>
-                <p className="text-xl font-black">{stats.present}</p>
-             </div>
-             <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/10">
-                <p className="text-[9px] uppercase tracking-wider font-bold opacity-80">Đi muộn</p>
-                <p className="text-xl font-black">{stats.late}</p>
-             </div>
-             <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm border border-white/10">
-                <p className="text-[9px] uppercase tracking-wider font-bold opacity-80">Tỷ lệ</p>
-                <p className="text-xl font-black">{stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0}%</p>
-             </div>
-          </div>
-        </DialogHeader>
-
-        <div className="p-6">
-          <div className="mb-4 flex items-center justify-between">
-             <h3 className="text-xs font-bold text-gray-900 uppercase tracking-tight">Lịch chuyên cần</h3>
-             <div className="flex gap-4">
-                <div className="flex items-center gap-1">
-                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                   <span className="text-[9px] font-bold text-gray-400">Đủ</span>
-                </div>
-                <div className="flex items-center gap-1">
-                   <span className="w-2 h-2 rounded-full bg-amber-500" />
-                   <span className="text-[9px] font-bold text-gray-400">Muộn</span>
-                </div>
-                <div className="flex items-center gap-1">
-                   <span className="w-2 h-2 rounded-full bg-rose-500" />
-                   <span className="text-[9px] font-bold text-gray-400">Vắng</span>
-                </div>
-             </div>
-          </div>
-
-          <div className="grid grid-cols-7 gap-2">
-            {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map(d => (
-              <div key={d} className="text-center text-[10px] font-bold text-gray-300 py-1">{d}</div>
-            ))}
-            {Array.from({ length: firstDay }).map((_, i) => (
-              <div key={`empty-${i}`} />
-            ))}
-            {days.map(day => {
-              const dateStr = `2026-03-${day.toString().padStart(2, '0')}`;
-              const record = records.find(r => r.date === dateStr);
-              return (
-                <div 
-                  key={day} 
-                  className={cn(
-                    "aspect-square flex flex-col items-center justify-center rounded-lg text-[11px] font-bold transition-all relative",
-                    record?.status === 'PRESENT' ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
-                    record?.status === 'LATE' ? "bg-amber-50 text-amber-600 border border-amber-100" :
-                    record?.status === 'ABSENT' ? "bg-rose-50 text-rose-600 border border-rose-100" :
-                    "bg-gray-50 text-gray-400"
-                  )}
-                >
-                  {day}
-                  {record && (
-                    <span className={cn(
-                      "absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white",
-                      record.status === 'PRESENT' ? "bg-emerald-500" :
-                      record.status === 'LATE' ? "bg-amber-500" : "bg-rose-500"
-                    )} />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-gray-100">
-             <div className="flex items-center justify-between mb-3 text-xs font-bold text-gray-900 uppercase">
-                Nhật ký gần đây
-             </div>
-             <ScrollArea className="h-32">
-                <div className="space-y-2 pr-4">
-                   {records.slice().reverse().map((r, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-50">
-                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-gray-800">{new Date(r.date).toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' })}</span>
-                            <span className="text-[9px] text-gray-400">Giờ vào: 17:30</span>
-                         </div>
-                         <Badge 
-                            variant="neutral" 
-                            className={cn(
-                               "text-[9px] px-2 h-4 border-none font-bold uppercase",
-                               r.status === 'PRESENT' ? "bg-emerald-100 text-emerald-700" :
-                               r.status === 'LATE' ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"
-                            )}>
-                            {r.status === 'PRESENT' ? 'CÓ MẶT' : r.status === 'LATE' ? 'MUỘN' : 'VẮNG'}
-                         </Badge>
-                      </div>
-                   ))}
-                </div>
-             </ScrollArea>
-          </div>
-        </div>
-
-        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-           <Button onClick={onClose} className="bg-white hover:bg-gray-100 text-gray-700 border-gray-200 h-8 text-[11px] font-bold px-6 shadow-none">
-              ĐÓNG
-           </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
