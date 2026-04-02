@@ -60,8 +60,8 @@ export function ClassTuitionTab({
   return (
     <div className="flex-1 overflow-hidden flex flex-col min-h-0">
       {/* Monthly Header & Selector */}
-      <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-6">
+      <div className="px-4 py-3 bg-white border-b border-gray-100 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
           <div className="flex items-center gap-2">
             <h2 className="text-xs font-bold text-gray-400 uppercase tracking-tight">Kỳ thu phí:</h2>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 border border-gray-200 rounded-md">
@@ -78,7 +78,7 @@ export function ClassTuitionTab({
             </div>
           </div>
 
-          <div className="flex items-center gap-4 border-l border-gray-200 pl-6">
+          <div className="flex flex-wrap items-center gap-4 sm:border-l sm:border-gray-200 sm:pl-6">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-gray-400 uppercase">Từ ngày</span>
               <input 
@@ -108,7 +108,7 @@ export function ClassTuitionTab({
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 p-3 border-b border-gray-100 shrink-0">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 border-b border-gray-100 shrink-0">
         <div className="bg-gray-50 rounded-lg px-4 py-3 flex items-center justify-between border border-gray-100">
           <div>
             <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Tổng đã thu</p>
@@ -142,8 +142,8 @@ export function ClassTuitionTab({
         <div className="p-3 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
           <h3 className="text-xs font-bold text-gray-900 uppercase">Trạng thái đóng phí học sinh</h3>
         </div>
-        <ScrollArea className="flex-1 border-b border-gray-100">
-          <Table className="border-collapse table-fixed w-full">
+        <div className="flex-1 overflow-auto bg-white border-b border-gray-100">
+          <Table className="border-collapse table-fixed min-w-[1100px] w-full">
             <TableHeader className="bg-white sticky top-0 z-10">
               <TableRow className="h-9 hover:bg-transparent border-b border-gray-200 text-[10px]">
                 <TableHead className="w-10 px-3 border-r border-gray-200">TT</TableHead>
@@ -215,7 +215,7 @@ export function ClassTuitionTab({
               })}
             </TableBody>
           </Table>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );

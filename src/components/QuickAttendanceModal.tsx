@@ -1,14 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  CheckCircle2, 
-  XCircle, 
-  ChevronRight, 
-  Search, 
-  Clock, 
-  Users,
-  CalendarCheck,
-  CheckCircle,
-  X
+  Search,
+  Check,
+  X,
+  UserCircle,
+  CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
@@ -19,13 +15,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
-import { mockStudents, mockSchedules, Student, AttendanceRecord, mockAttendance } from '@/services/mockData';
-import { toast } from 'sonner';
+import { mockStudents, mockSchedules, AttendanceRecord, mockAttendance } from '@/services/mockData';
 
 interface QuickAttendanceModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const classMapping: Record<string, string> = {
+  '6 Moon': '6a1',
+  '6 Star': '6a2',
+  '6 Galaxy': '6a3',
+  '7 Sun': '7a1',
+  '7 Venus': '7a2'
+};
 
 export function QuickAttendanceModal({ isOpen, onClose }: QuickAttendanceModalProps) {
   const [selectedClass, setSelectedClass] = useState<string | null>(mockSchedules[0]?.class || null);
@@ -38,7 +41,8 @@ export function QuickAttendanceModal({ isOpen, onClose }: QuickAttendanceModalPr
   
   const students = useMemo(() => {
     if (!selectedClass) return [];
-    return mockStudents.filter(s => s.class === selectedClass);
+    const classId = classMapping[selectedClass] || selectedClass;
+    return mockStudents.filter(s => s.class === classId || s.class === selectedClass);
   }, [selectedClass]);
 
   const filteredStudents = students.filter(s => 
@@ -46,7 +50,16 @@ export function QuickAttendanceModal({ isOpen, onClose }: QuickAttendanceModalPr
     s.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleStatusChange = (studentId: string, status: 'PRESENT' | 'ABSENT') => {
+  const stats = useMemo(() => {
+    const classId = selectedClass ? (classMapping[selectedClass] || selectedClass) : '';
+    const classRecords = records.filter(r => (r.classId === classId || r.classId === selectedClass) && r.date === today);
+    const present = classRecords.filter(r => r.status === 'PRESENT').length;
+    const absent = classRecords.filter(r => r.status === 'ABSENT').length;
+    return { present, absent, total: students.length };
+  }, [records, selectedClass, students, today]);
+
+  const handleStatusChange = (studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE') => {
+    const classId = selectedClass ? (classMapping[selectedClass] || selectedClass) : '';
     setRecords(prev => {
       const existing = prev.findIndex(r => r.studentId === studentId && r.date === today);
       if (existing >= 0) {
@@ -59,172 +72,193 @@ export function QuickAttendanceModal({ isOpen, onClose }: QuickAttendanceModalPr
         studentId, 
         date: today, 
         status, 
-        classId: selectedClass || '' 
+        classId: classId
       }];
     });
   };
 
   const handleMarkAll = () => {
     if (!selectedClass) return;
+    const classId = classMapping[selectedClass] || selectedClass;
     const next = [...records];
     students.forEach(s => {
       const idx = next.findIndex(r => r.studentId === s.id && r.date === today);
       if (idx >= 0) {
         next[idx] = { ...next[idx], status: 'PRESENT' };
       } else {
-        next.push({ id: `qa-${Date.now()}-${s.id}`, studentId: s.id, date: today, status: 'PRESENT', classId: selectedClass || '' });
+        next.push({ id: `qa-${Date.now()}-${s.id}`, studentId: s.id, date: today, status: 'PRESENT', classId: classId });
       }
     });
     setRecords(next);
-    toast.success(`Đã đánh diện tất cả lớp ${selectedClass}`);
   };
 
   const resetModal = () => {
-    setSelectedClass(mockSchedules[0]?.class || null);
     setSearchQuery('');
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if(!open) { onClose(); setTimeout(resetModal, 300); } }}>
-      <DialogContent className="max-w-[700px] p-0 overflow-hidden bg-white border border-gray-100 rounded-lg shadow-xl outline-none ring-0">
-        <DialogHeader className="px-4 py-2 border-b border-gray-50 bg-white">
-          <div className="flex items-center justify-start">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-3 bg-gold-400 rounded-full" />
-              <DialogTitle className="text-[12px] font-bold text-gray-900 tracking-tight uppercase">
-                Điểm danh hằng ngày
-              </DialogTitle>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gray-50 border border-gray-100 rounded-md text-[9px] font-black text-gray-400">
-              <CalendarCheck className="w-2.5 h-2.5 text-gold-500" />
-              {today.split('-').reverse().join('/')}
-            </div>
-          </div>
+      <DialogContent className="max-w-[780px] p-0 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm font-sans">
+        {/* Header */}
+        <DialogHeader className="px-5 py-4 border-b border-gray-200 bg-gray-50/50 flex flex-row items-center justify-between mt-0">
+          <DialogTitle className="text-[16px] font-medium text-gray-900 tracking-normal m-0">Điểm danh nhanh</DialogTitle>
+          <button 
+             onClick={onClose}
+             className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={18} />
+          </button>
         </DialogHeader>
 
-        <div className="flex h-[450px] overflow-hidden">
-          {/* LEFT PANEL - CLASS LIST */}
-          <div className="w-[200px] border-r border-gray-50 bg-gray-50/20 flex flex-col">
-            <div className="p-2 border-b border-gray-50 bg-white/50">
-              <span className="text-[12px] font-black text-gray-400 pl-1">Lớp giảng dạy</span>
+        <div className="flex h-[520px]">
+          {/* Sidebar */}
+          <div className="w-[200px] border-r border-gray-200 bg-gray-50/30 flex flex-col">
+            <div className="p-3">
+              <p className="text-xs font-medium text-gray-500 mb-2 px-2">Danh sách lớp</p>
+              <ScrollArea className="h-[430px]">
+                <div className="space-y-1">
+                  {classes.map((cls) => {
+                    const isActive = selectedClass === cls.class;
+                    const classId = classMapping[cls.class] || cls.class;
+                    const classStudents = mockStudents.filter(s => s.class === classId || s.class === cls.class);
+                    const isCompleted = classStudents.length > 0 && classStudents.every(s => 
+                       records.some(r => r.studentId === s.id && r.date === today)
+                    );
+                    
+                    return (
+                      <button
+                        key={cls.id}
+                        onClick={() => setSelectedClass(cls.class)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors text-left",
+                          isActive 
+                            ? "bg-teal-50 text-teal-800 font-medium" 
+                            : "text-gray-600 hover:bg-gray-100"
+                        )}
+                      >
+                        <span className="truncate">Lớp {cls.class}</span>
+                        {isCompleted && <CheckCircle2 className={cn("w-4 h-4 shrink-0", isActive ? "text-teal-600" : "text-teal-500/70")} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
             </div>
-            <ScrollArea className="flex-1 p-1">
-              <div className="space-y-0.5">
-                {classes.map((cls) => {
-                  const studentCount = mockStudents.filter(s => s.class === cls.class).length;
-                  const isActive = selectedClass === cls.class;
-                  return (
-                    <button
-                      key={cls.id}
-                      onClick={() => setSelectedClass(cls.class)}
-                      className={cn(
-                        "w-full flex flex-col p-2 rounded transition-all text-left border border-transparent",
-                        isActive 
-                          ? "bg-white border-gold-100 shadow-sm ring-1 ring-gold-50" 
-                          : "hover:bg-gray-100/50 grayscale hover:grayscale-0"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className={cn(
-                          "text-[11px] font-bold",
-                          isActive ? "text-gold-700" : "text-gray-600"
-                        )}>Lớp {cls.class}</span>
-                        <span className="text-[8px] font-black text-gray-300">{studentCount}</span>
-                      </div>
-                      <span className="text-[9px] text-gray-400 font-medium tabular-nums">{cls.time.split(' - ')[0]}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </ScrollArea>
           </div>
 
-          {/* RIGHT PANEL - STUDENT LIST */}
-          <div className="flex-1 flex flex-col bg-white">
-            {selectedClass ? (
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-3 py-2 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-black text-gray-900">Học sinh lớp {selectedClass}</span>
-                    <button 
-                      onClick={handleMarkAll}
-                      className="text-[9px] font-bold text-emerald-600 hover:text-emerald-700 decoration-emerald-200 underline underline-offset-2 ml-4"
-                    >
-                      TẤT CẢ CÓ MẶT
-                    </button>
-                  </div>
-                  <div className="relative w-32">
-                    <Search className="absolute left-1.5 top-1.5 w-2.5 h-2.5 text-gray-300 pointer-events-none" />
-                    <input 
-                      placeholder="Tìm..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-6 pl-5 pr-2 bg-gray-50/50 border border-transparent rounded-sm text-[10px] outline-none focus:bg-white focus:border-gold-200 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-
-                <ScrollArea className="flex-1 p-1">
-                  <div className="grid grid-cols-2 gap-0.5">
-                    {filteredStudents.map((s) => {
-                      const record = records.find(r => r.studentId === s.id && r.date === today);
-                      return (
-                        <div key={s.id} className="flex items-center justify-between p-1.5 hover:bg-gray-50/40 rounded border border-transparent transition-all">
-                          <div className="flex items-center gap-1.5 flex-grow min-w-0">
-                            <div className={cn(
-                              "w-0.5 h-5 shrink-0 rounded-full",
-                              record?.status === 'PRESENT' ? "bg-emerald-500" : record?.status === 'ABSENT' ? "bg-rose-500" : "bg-gray-200 shadow-inner"
-                            )} />
-                            <div className="truncate">
-                              <p className="text-[10px] font-bold text-gray-700 truncate">{s.name}</p>
-                              <p className="text-[8px] text-gray-400 font-mono tracking-tighter uppercase">{s.id}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-0.5 shrink-0 ml-1">
-                            <button
-                              onClick={() => handleStatusChange(s.id, 'PRESENT')}
-                              className={cn(
-                                "px-1.5 h-4.5 rounded-sm text-[8px] font-bold transition-all border",
-                                record?.status === 'PRESENT' 
-                                  ? "bg-emerald-500 text-white border-emerald-600 shadow-sm" 
-                                  : "bg-white text-gray-300 border-gray-100 hover:text-emerald-600"
-                              )}
-                            >
-                              MẶT
-                            </button>
-                            <button
-                              onClick={() => handleStatusChange(s.id, 'ABSENT')}
-                              className={cn(
-                                "px-1.5 h-4.5 rounded-sm text-[8px] font-bold transition-all border",
-                                record?.status === 'ABSENT' 
-                                  ? "bg-rose-500 text-white border-rose-600 shadow-sm" 
-                                  : "bg-white text-gray-300 border-gray-100 hover:text-rose-600"
-                              )}
-                            >
-                              VẮNG
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
-
-                <div className="p-2 border-t border-gray-50 bg-gray-50/10 flex justify-end">
-                   <Button 
-                    className="bg-gray-900 border-none hover:bg-black text-white px-6 h-7 text-[10px] font-bold rounded shadow-sm"
-                    onClick={onClose}
-                  >
-                    HOÀN TẤT ĐIỂM DANH
-                  </Button>
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col bg-white overflow-hidden">
+            <div className="p-5 pb-4 border-b border-gray-100 flex items-end justify-between">
+              <div>
+                <h2 className="text-[18px] font-medium text-gray-900 mb-1">Lớp {selectedClass}</h2>
+                <div className="flex gap-4 text-xs font-normal text-gray-500 mt-2">
+                  <span>Sĩ số: {stats.total}</span>
+                  <span>Có mặt: <b className="text-teal-700 font-medium">{stats.present}</b></span>
+                  <span>Vắng: <b className="text-gray-700 font-medium">{stats.absent}</b></span>
                 </div>
               </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center gap-2 opacity-20">
-                <Users className="w-8 h-8" />
-                <p className="text-[10px] font-bold uppercase tracking-widest">Chọn lớp để điểm danh</p>
+
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input 
+                    placeholder="Tìm kiếm..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-8 pl-8 pr-3 w-[180px] bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all placeholder:text-gray-400"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  className="h-8 px-3 text-[13px] bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal shadow-sm"
+                  onClick={handleMarkAll}
+                >
+                  <Check className="w-4 h-4 mr-1.5 text-teal-600" />
+                  Có mặt tất cả
+                </Button>
               </div>
-            )}
+            </div>
+
+            <ScrollArea className="flex-1 p-5">
+              <div className="space-y-0 text-sm">
+                {filteredStudents.map((student) => {
+                  const record = records.find(r => r.studentId === student.id && r.date === today);
+                  const status = record?.status;
+
+                  return (
+                    <div key={student.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors px-1 -mx-1">
+                      <div className="flex items-center gap-3">
+                         <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 shrink-0 border border-gray-200/50">
+                           <UserCircle className="w-5 h-5 opacity-50" />
+                         </div>
+                         <div>
+                           <div className="font-medium text-gray-900">{student.name}</div>
+                           <div className="text-xs text-gray-500">{student.id}</div>
+                         </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'PRESENT')}
+                          className={cn(
+                            "px-3 h-7 text-xs font-medium rounded border transition-colors",
+                            status === 'PRESENT' 
+                              ? "bg-teal-50 border-teal-200 text-teal-700" 
+                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                          )}
+                        >
+                          Có mặt
+                        </button>
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'LATE')}
+                          className={cn(
+                            "px-3 h-7 text-xs font-medium rounded border transition-colors",
+                            status === 'LATE' 
+                              ? "bg-amber-50 border-amber-200 text-amber-700" 
+                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                          )}
+                        >
+                          Đến muộn
+                        </button>
+                        <button 
+                          onClick={() => handleStatusChange(student.id, 'ABSENT')}
+                          className={cn(
+                            "px-3 h-7 text-xs font-medium rounded border transition-colors",
+                            status === 'ABSENT' 
+                              ? "bg-gray-100 border-gray-300 text-gray-800" 
+                              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                          )}
+                        >
+                          Vắng mặt
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {filteredStudents.length === 0 && (
+                  <div className="text-center py-8 text-sm text-gray-500">
+                    Không tìm thấy học sinh.
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+            
+            <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3 shrink-0">
+               <span className="text-xs text-gray-500 mr-auto">Hệ thống sẽ tự động lưu sau mỗi thao tác.</span>
+               <Button 
+                 variant="outline" 
+                 className="h-8 px-4 text-[13px] font-normal border-gray-200"
+                 onClick={onClose}
+               >
+                 Đóng
+               </Button>
+               <Button 
+                 className="h-8 px-5 bg-teal-600 hover:bg-teal-700 text-white text-[13px] font-medium shadow-sm border-0"
+                 onClick={onClose}
+               >
+                 Hoàn tất
+               </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

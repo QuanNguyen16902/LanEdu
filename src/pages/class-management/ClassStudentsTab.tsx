@@ -37,8 +37,8 @@ export function ClassStudentsTab({
 }: ClassStudentsTabProps) {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <ScrollArea className="flex-1">
-        <Table className="border-collapse table-fixed w-full">
+      <div className="flex-1 overflow-auto bg-white">
+        <Table className="border-collapse table-fixed min-w-[1000px] w-full">
           <TableHeader className="bg-[#F1F5F9] sticky top-0 z-10">
             <TableRow className="h-10 hover:bg-transparent border-b border-gray-200">
               <TableHead className="w-8 px-2 border-r border-gray-200">
@@ -56,12 +56,10 @@ export function ClassStudentsTab({
               <TableHead className="w-28 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Giờ học</TableHead>
               <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">GVCN/ Advisor</TableHead>
               <TableHead className="w-28 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Học phí</TableHead>
-              <TableHead className="text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Ghi chú</TableHead>
               <TableHead className="w-24 text-center text-[11px] font-medium text-gray-500 px-3">Thao tác</TableHead>
             </TableRow>
             <TableRow className="h-8 bg-white border-b border-gray-200">
               <TableCell className="border-r border-gray-200" />
-              <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
@@ -108,7 +106,6 @@ export function ClassStudentsTab({
                 <TableCell className="text-[11px] font-bold text-gray-700 px-3 border-r border-gray-200 tabular-nums">
                   {(student.pricePerSession ?? 180000).toLocaleString('vi-VN')}đ
                 </TableCell>
-                <TableCell className="text-[11px] text-gray-300 italic px-3 border-r border-gray-200">—</TableCell>
                 <TableCell className="text-center px-2">
                   <div className="flex items-center justify-center gap-1">
                     <Button 
@@ -118,13 +115,6 @@ export function ClassStudentsTab({
                       onClick={() => onEdit?.(student)}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 w-7 p-0 hover:bg-gray-100 text-gray-400 rounded-md"
-                    >
-                      <MoreHorizontal className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </TableCell>
@@ -141,7 +131,7 @@ export function ClassStudentsTab({
             )}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
       <div className="h-9 border-t border-gray-100 px-4 flex items-center justify-between shrink-0 bg-gray-50/50">
         <span className="text-[11px] text-gray-400">
           Tổng số: <b className="text-gray-700">{filteredStudents.length}</b> học sinh

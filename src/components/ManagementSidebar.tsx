@@ -64,7 +64,7 @@ export function ManagementSidebar({ activeMenu, onMenuChange }: ManagementSideba
   const isAttendanceActive = currentPath === '/attendance' || activeMenu === 'diem-danh';
 
   return (
-    <div className="w-[190px] bg-white border-r border-gray-200 flex flex-col shrink-0 h-full">
+    <div className="w-[150px] bg-white border-r border-gray-200 flex flex-col shrink-0 h-full">
       <div className="py-4">
         <h2 className="text-[10px] font-bold mb-2 px-4 tracking-widest text-gray-800">Quản lý</h2>
         <nav className="space-y-0">

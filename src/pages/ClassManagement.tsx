@@ -19,7 +19,8 @@ import {
   CreditCard,
   AlertCircle,
   TrendingUp,
-  Filter
+  Filter,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -55,6 +56,7 @@ import { ClassAttendanceTab } from './class-management/ClassAttendanceTab';
 import { ClassTuitionTab, TuitionDetailPanel } from './class-management/ClassTuitionTab';
 import { AttendanceDetailsModal } from './class-management/AttendanceDetailsModal';
 import { EditStudentModal } from './class-management/EditStudentModal';
+import { StudentDetailPanel } from './class-management/StudentDetailPanel';
 
 const CLASSES_TREE = [
   {
@@ -335,7 +337,7 @@ export default function ClassManagementPage() {
       <ManagementSidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
 
       {/* Class tree sidebar */}
-      <div className="w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+      <div className="w-[150px] bg-white border-r border-gray-200 flex flex-col shrink-0">
         <div className="p-3 border-b border-gray-100">
           <Button size="sm" className="w-full h-8 bg-[#E6B800] hover:bg-gold-600 font-medium text-xs text-white rounded-md gap-2 shadow-sm border-none">
             <Plus className="w-3.5 h-3.5" />
@@ -373,8 +375,10 @@ export default function ClassManagementPage() {
         </ScrollArea>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white m-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden py-2">
+      {/* Main content area with Right Panel */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Table Container */}
+        <div className="flex-1 flex flex-col min-w-0 bg-white m-2 mr-2 rounded-sm border border-gray-200 shadow-sm overflow-hidden py-0">
 
         {/* Header with tabs */}
         <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
@@ -513,32 +517,37 @@ export default function ClassManagementPage() {
           />
         )}
 
-        <PaymentSlipModal
-          isOpen={isPaymentModalOpen}
-          onClose={() => setIsPaymentModalOpen(false)}
-          student={selectedStudentForPayment}
-          onSave={handlePaymentSave}
-        />
-        <AttendanceDetailsModal
-          isOpen={isAttendanceDetailsOpen}
-          onClose={() => setIsAttendanceDetailsOpen(false)}
-          student={viewingAttendanceStudent}
-        />
-        <TuitionDetailPanel
+        </div>
+
+        {/* Right Info Panel */}
+        <StudentDetailPanel
           isOpen={isDetailPanelOpen}
-          onClose={() => setIsDetailPanelOpen(false)}
           student={selectedStudentForDetail}
           records={records}
-          fromDate={fromDate}
-          toDate={toDate}
-        />
-        <EditStudentModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          student={editingStudent}
-          onSave={handleEditSave}
+          getTotalUnpaidSessions={getTotalUnpaidSessions}
+          onOpenPaymentModal={openPaymentModal}
+          onClose={() => setIsDetailPanelOpen(false)}
         />
       </div>
+
+      {/* Restored Modals */}
+      <PaymentSlipModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        student={selectedStudentForPayment}
+        onSave={handlePaymentSave}
+      />
+      <AttendanceDetailsModal
+        isOpen={isAttendanceDetailsOpen}
+        onClose={() => setIsAttendanceDetailsOpen(false)}
+        student={viewingAttendanceStudent}
+      />
+      <EditStudentModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        student={editingStudent}
+        onSave={handleEditSave}
+      />
     </div>
   );
 }

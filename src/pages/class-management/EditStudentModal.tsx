@@ -6,8 +6,6 @@ import { Input } from '@/components/ui/Input';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from '@/components/ui/Dialog';
 import { Student } from '@/services/mockData';
 import { toast } from 'sonner';
@@ -44,59 +42,52 @@ export function EditStudentModal({ isOpen, onClose, student, onSave }: EditStude
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[500px] p-0 overflow-hidden bg-white border-none rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-300">
-        <DialogHeader className="p-6 bg-gradient-to-br from-gold-500 to-amber-600 text-white relative">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm border border-white/10">
-              <User className="w-5 h-5" />
-            </div>
-            <div>
-              <DialogTitle className="text-lg font-bold">Chỉnh sửa thông tin học sinh</DialogTitle>
-              <p className="text-[11px] opacity-80 mt-0.5 uppercase tracking-wider font-medium">Mã học sinh: {student.id}</p>
+      <DialogContent className="max-w-[400px] p-0 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm">
+        
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+          <div>
+            <h2 className="text-[18px] font-medium text-gray-900 leading-tight">Sửa thông tin học viên</h2>
+            <p className="text-[13px] text-gray-500 mt-1">Mã HS: {student.id}</p>
+          </div>
+         
+        </div>
+
+        {/* Form Content */}
+        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4">
+          <div className="space-y-2">
+            <label className="text-[13px] font-medium text-gray-700">Họ và tên</label>
+            <div className="relative">
+              <User className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Input 
+                value={formData.name || ''} 
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Nhập họ và tên..."
+                className="pl-9 h-10 text-[14px] bg-white border-gray-200 focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] rounded-md shadow-sm transition-all"
+              />
             </div>
           </div>
-          <button 
-            onClick={onClose}
-            className="absolute top-6 right-6 p-1.5 hover:bg-white/20 rounded-full transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div className="col-span-2 space-y-2">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-tight">Họ và tên</label>
-              <div className="relative group">
-                <User className="absolute left-3 top-2.5 w-4 h-4 text-gray-300 group-focus-within:text-gold-500 transition-colors" />
-                <Input 
-                  value={formData.name || ''} 
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Nhập họ và tên học sinh..."
-                  className="pl-10 h-10 text-[13px] border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-gold-500 focus:border-gold-500 rounded-xl transition-all"
-                />
-              </div>
+          <div className="space-y-2">
+            <label className="text-[13px] font-medium text-gray-700">Ngày sinh</label>
+            <div className="relative">
+              <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Input 
+                type="date"
+                value={formData.dob || ''} 
+                onChange={e => setFormData({ ...formData, dob: e.target.value })}
+                className="pl-9 h-10 text-[14px] bg-white border-gray-200 focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] rounded-md shadow-sm transition-all"
+              />
             </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-tight">Ngày sinh</label>
-              <div className="relative group">
-                <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-gray-300 group-focus-within:text-gold-500 transition-colors" />
-                <Input 
-                  type="date"
-                  value={formData.dob || ''} 
-                  onChange={e => setFormData({ ...formData, dob: e.target.value })}
-                  className="pl-10 h-10 text-[13px] border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-gold-500 focus:border-gold-500 rounded-xl transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-tight">Giới tính</label>
-              <div className="relative group">
-                <ChevronDown className="absolute right-3 top-3 w-3 h-3 text-gray-400 pointer-events-none" />
+              <label className="text-[13px] font-medium text-gray-700">Giới tính</label>
+              <div className="relative">
+                <ChevronDown className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <select 
-                  className="w-full h-10 pl-3 pr-8 text-[13px] rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-gold-500 focus:border-gold-500 outline-none appearance-none transition-all cursor-pointer"
+                  className="w-full h-10 pl-3 pr-8 text-[14px] bg-white border border-gray-200 rounded-md focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] outline-none appearance-none shadow-sm transition-all text-gray-900"
                   value={formData.gender || ''}
                   onChange={e => setFormData({ ...formData, gender: e.target.value })}
                 >
@@ -108,51 +99,51 @@ export function EditStudentModal({ isOpen, onClose, student, onSave }: EditStude
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-tight">Trạng thái</label>
-              <div className="relative group">
-                <ChevronDown className="absolute right-3 top-3 w-3 h-3 text-gray-400 pointer-events-none" />
+              <label className="text-[13px] font-medium text-gray-700">Trạng thái</label>
+              <div className="relative">
+                <ChevronDown className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
                 <select 
-                  className="w-full h-10 pl-3 pr-8 text-[13px] rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-gold-500 focus:border-gold-500 outline-none appearance-none transition-all cursor-pointer"
+                  className="w-full h-10 pl-3 pr-8 text-[14px] bg-white border border-gray-200 rounded-md focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] outline-none appearance-none shadow-sm transition-all text-gray-900"
                   value={formData.status || ''}
                   onChange={e => setFormData({ ...formData, status: e.target.value })}
                 >
-                  <option value="Học viên chính thức">Học viên chính thức</option>
-                  <option value="Học viên tiềm năng">Học viên tiềm năng</option>
+                  <option value="Học viên chính thức">Chính thức</option>
+                  <option value="Học viên tiềm năng">Tiềm năng</option>
                 </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-gray-400 uppercase tracking-tight">Học phí/buổi</label>
-              <div className="relative group">
-                <CreditCard className="absolute left-3 top-2.5 w-4 h-4 text-gray-300 group-focus-within:text-gold-500 transition-colors" />
-                <Input 
-                  type="number"
-                  value={formData.pricePerSession || ''} 
-                  onChange={e => setFormData({ ...formData, pricePerSession: Number(e.target.value) })}
-                  placeholder="200000"
-                  className="pl-10 h-10 text-[13px] border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-gold-500 focus:border-gold-500 rounded-xl transition-all font-mono font-bold"
-                />
-                <span className="absolute right-3 top-2.5 text-[11px] font-bold text-gray-300">đ</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 flex gap-3">
+          <div className="space-y-2">
+            <label className="text-[13px] font-medium text-gray-700">Học phí / buổi</label>
+            <div className="relative">
+              <CreditCard className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Input 
+                type="number"
+                value={formData.pricePerSession || ''} 
+                onChange={e => setFormData({ ...formData, pricePerSession: Number(e.target.value) })}
+                placeholder="200000"
+                className="pl-9 h-10 text-[14px] bg-white border-gray-200 focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] rounded-md shadow-sm transition-all font-medium"
+              />
+              <span className="absolute right-3 top-2.5 text-[13px] text-gray-500 font-medium">VNĐ</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="pt-4 flex justify-end gap-3 mt-2 border-t border-gray-100/0">
             <Button 
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 h-11 text-[12px] font-bold border-gray-200 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-all shadow-none"
+              className="h-10 px-4 text-[14px] font-medium bg-transparent border-gray-200 text-gray-900 hover:bg-gray-50 rounded-md shadow-none"
             >
-              HỦY BỎ
+              Hủy bỏ
             </Button>
             <Button 
               type="submit"
-              className="flex-[1.5] h-11 text-[12px] font-bold bg-[#1E40AF] hover:bg-blue-800 text-white shadow-lg shadow-blue-900/20 rounded-xl gap-2 group transition-all"
+              className="h-10 px-5 text-[14px] font-medium bg-[#C9A227] hover:bg-[#A8841F] text-white rounded-md shadow-none border-none"
             >
-              <CheckCircle2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              LƯU THAY ĐỔI
+              Lưu thay đổi
             </Button>
           </div>
         </form>

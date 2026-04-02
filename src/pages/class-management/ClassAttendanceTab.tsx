@@ -44,8 +44,8 @@ export function ClassAttendanceTab({
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {/* Attendance stats bar */}
-      <div className="px-4 py-2 bg-gold-50/30 border-b border-gray-200 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-6">
+      <div className="px-4 py-3 bg-gold-50/30 border-b border-gray-200 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 xl:gap-6">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             <span className="text-[11px] font-medium text-gray-600">Có mặt: <b className="text-emerald-700">{currentStats.present}</b></span>
@@ -66,7 +66,7 @@ export function ClassAttendanceTab({
             </b>
           </span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 w-full xl:w-auto mt-1 xl:mt-0">
           <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-md shadow-sm">
             <Calendar className="w-3.5 h-3.5 text-gray-400" />
             <input
@@ -87,8 +87,8 @@ export function ClassAttendanceTab({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <Table className="border-collapse table-fixed w-full">
+      <div className="flex-1 overflow-auto bg-white">
+        <Table className="border-collapse table-fixed min-w-[950px] w-full">
           <TableHeader className="bg-[#F1F5F9] sticky top-0 z-10">
             <TableRow className="h-10 hover:bg-transparent border-b border-gray-200">
               <TableHead className="w-8 border-r border-gray-200" />
@@ -161,7 +161,7 @@ export function ClassAttendanceTab({
             })}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
