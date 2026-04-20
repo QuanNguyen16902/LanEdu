@@ -136,7 +136,7 @@ export function DataTable<T>({
                     key={col.key as string}
                     style={{ width: col.width }}
                     className={cn(
-                      "group py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-text-secondary select-none",
+                      "group py-4 px-4 font-semibold text-[11px] tracking-wider text-text-secondary select-none",
                       col.sortable && "cursor-pointer hover:text-gold-600 transition-colors"
                     )}
                     onClick={() => col.sortable && handleSort(col.key as string)}
@@ -203,7 +203,7 @@ export function DataTable<T>({
         {/* Improved Pagination Footer */}
         <div className="px-6 py-4 border-t border-border bg-background/50 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <span className="text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+            <span className="text-[11px] font-semibold text-text-secondary tracking-widest">
               Showing {Math.min(processedData.length, (currentPage - 1) * pageSize + 1)} - {Math.min(currentPage * pageSize, processedData.length)} of {processedData.length} entries
             </span>
           </div>

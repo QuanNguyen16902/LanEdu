@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { formatDate, cn } from '@/lib/utils';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ManagementSidebar } from '@/components/ManagementSidebar';
 import { ScrollArea } from '@/components/ui/ScrollArea';
 
 const CLASSES_TREE = [
@@ -163,8 +162,7 @@ export default function AttendancePage() {
   }, [records, selectedDate, selectedClass, filteredStudents]);
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-[#F8FAFC]">
-      <ManagementSidebar activeMenu="diem-danh" onMenuChange={() => {}} />
+    <div className="flex h-full w-full overflow-hidden bg-[#F8FAFC]">
 
       <div className="flex-1 flex flex-col min-w-0 bg-white m-3 rounded-lg border border-gray-200 shadow-sm overflow-hidden py-2">
         <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
@@ -346,7 +344,7 @@ export default function AttendancePage() {
                                   : "bg-white text-gray-400 border-gray-100 hover:bg-emerald-50 hover:text-emerald-600"
                               )}
                             >
-                              CÓ MẶT
+                              Có mặt
                             </button>
                             <button
                               onClick={() => handleStatusChange(student.id, 'LATE')}
@@ -357,7 +355,7 @@ export default function AttendancePage() {
                                   : "bg-white text-gray-400 border-gray-100 hover:bg-amber-50 hover:text-amber-600"
                               )}
                             >
-                              MUỘN
+                              Muộn
                             </button>
                             <button
                               onClick={() => handleStatusChange(student.id, 'ABSENT')}
@@ -368,7 +366,7 @@ export default function AttendancePage() {
                                   : "bg-white text-gray-400 border-gray-100 hover:bg-rose-50 hover:text-rose-600"
                               )}
                             >
-                              VẮNG
+                              Vắng
                             </button>
                           </div>
                         </TableCell>

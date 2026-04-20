@@ -115,7 +115,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-6 w-full max-w-full mx-auto bg-gray-50 min-h-[calc(100vh-4rem)]">
+    <div className="p-4 lg:p-6 space-y-6 w-full max-w-full mx-auto bg-gray-50 min-h-full">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Tổng quan hệ thống</h1>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-4 bg-gold-500 rounded-full" />
-          <h2 className="text-sm font-bold text-gray-800 uppercase tracking-tight">Cần điểm danh hôm nay</h2>
+          <h2 className="text-sm font-semibold text-gray-800 tracking-tight">Cần điểm danh hôm nay</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {mockSchedules.slice(1, 4).map((cls, idx) => (
@@ -171,21 +171,21 @@ export default function DashboardPage() {
                         <h3 className="text-sm font-bold text-gray-900 leading-none">Lớp {cls.class}</h3>
                         <p className="text-[11px] text-gray-400 mt-1.5 font-medium italic">{cls.subject}</p>
                       </div>
-                      <Badge className="bg-amber-50 text-amber-600 border-none font-bold text-[9px] px-2 h-4">
-                        CHƯA ĐIỂM DANH
+                      <Badge className="bg-amber-50 text-amber-600 border-none font-semibold text-[9px] px-2 h-4">
+                        Chưa điểm danh
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between mt-6 pt-3 border-t border-gray-50">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-[11px] font-bold text-gray-600">{cls.time.split(' - ')[0]}</span>
+                        <span className="text-[11px] font-semibold text-gray-600">{cls.time.split(' - ')[0]}</span>
                       </div>
                       <Button 
                         size="sm" 
                         onClick={() => window.location.href = `/classes?class=${cls.class}&tab=attendance`}
-                        className="h-7 px-4 text-[10px] font-black bg-[#E6B800] hover:bg-gold-600 text-white rounded-full border-none shadow-md shadow-gold-500/10 gap-1.5 group/btn transition-all"
+                        className="h-7 px-4 text-[10px] font-semibold bg-[#E6B800] hover:bg-gold-600 text-white rounded-full border-none shadow-md shadow-gold-500/10 gap-1.5 group/btn transition-all"
                       >
-                        ĐIỂM DANH NGAY
+                        Điểm danh ngay
                         <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />
                       </Button>
                     </div>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
         <div className="space-y-6">
            <Card className="border-gray-200 shadow-none bg-white rounded-md">
             <CardHeader className="px-4 py-3 border-b border-gray-100">
-               <CardTitle className="text-sm font-medium text-gray-900">Chi tiết theo lớp</CardTitle>
+               <CardTitle className="text-sm font-semibold text-gray-900">Chi tiết theo lớp</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                <Table>

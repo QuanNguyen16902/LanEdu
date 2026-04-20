@@ -1,4 +1,5 @@
 import { Role } from '@/lib/auth-context';
+import { Teacher } from '@/types/teacher';
 
 export interface Student {
   id: string;
@@ -8,7 +9,6 @@ export interface Student {
   status?: string;
   dob?: string;
   gender?: string;
-  advisor?: string;
   attendance: number;
   score: number;
   pricePerSession?: number;
@@ -35,6 +35,9 @@ export interface AttendanceRecord {
   status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED' | 'UNEXCUSED';
   classId: string;
   isPaid?: boolean;
+  updatedAt?: string;
+  statusColor?: string;
+  note?: string;
 }
 
 export interface Evaluation {
@@ -46,33 +49,43 @@ export interface Evaluation {
   date: string;
 }
 
+export const mockTeachers: Teacher[] = [
+  { id: 'T001', name: 'Trần Thị Mai', type: 'LEAD', email: 'mai.tt@school.com', phone: '0912345678', status: 'ACTIVE' },
+  { id: 'T002', name: 'Nguyễn Văn Hùng', type: 'LEAD', email: 'hung.nv@school.com', phone: '0987654321', status: 'ACTIVE' },
+  { id: 'T003', name: 'Lê Thị Thu', type: 'LEAD', email: 'thu.lt@school.com', phone: '0901234567', status: 'ACTIVE' },
+  { id: 'T004', name: 'Đặng Thị Thúy Hằng', type: 'LEAD', email: 'hang.dtt@school.com', phone: '0922334455', status: 'ACTIVE' },
+  { id: 'T005', name: 'Lê Minh Khôi', type: 'LEAD', email: 'khoi.lm@school.com', phone: '0933445566', status: 'ACTIVE' },
+  { id: 'TA001', name: 'Nguyễn Bích Ngọc', type: 'TA', email: 'ngoc.nb@school.com', phone: '0944556677', status: 'ACTIVE' },
+  { id: 'TA002', name: 'Trần Anh Tuấn', type: 'TA', email: 'tuan.ta@school.com', phone: '0955667788', status: 'ACTIVE' },
+];
+
 export const mockStudents: Student[] = [
   // Class 6 Moon (6a1)
-  { id: 'ED0125310001', name: 'Nguyễn Minh Anh', class: '6a1', status: 'Đang theo học', dob: '12/03/2014', gender: 'Nữ/Female', advisor: 'Trần Thị Mai', pricePerSession: 200000, attendance: 95, score: 8.5 },
-  { id: 'ED0125310002', name: 'Trần Quốc Bảo', class: '6a1', status: 'Đang theo học', dob: '25/05/2014', gender: 'Nam/Male', advisor: 'Trần Thị Mai', pricePerSession: 200000, attendance: 88, score: 7.2 },
-  { id: 'ED0125310003', name: 'Lê Diệp Chi', class: '6a1', status: 'Đang theo học', dob: '08/07/2014', gender: 'Nữ/Female', advisor: 'Trần Thị Mai', pricePerSession: 200000, attendance: 92, score: 9.0 },
-  { id: 'ED0125310004', name: 'Phạm Tiến Dũng', class: '6a1', status: 'Nghỉ học', dob: '14/09/2014', gender: 'Nam/Male', advisor: 'Trần Thị Mai', pricePerSession: 200000, attendance: 75, score: 6.5 },
+  { id: 'ED0125310001', name: 'Nguyễn Minh Anh', class: '6a1', status: 'Đang theo học', dob: '12/03/2014', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 95, score: 8.5 },
+  { id: 'ED0125310002', name: 'Trần Quốc Bảo', class: '6a1', status: 'Đang theo học', dob: '25/05/2014', gender: 'Nam/Male', pricePerSession: 200000, attendance: 88, score: 7.2 },
+  { id: 'ED0125310003', name: 'Lê Diệp Chi', class: '6a1', status: 'Đang theo học', dob: '08/07/2014', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 92, score: 9.0 },
+  { id: 'ED0125310004', name: 'Phạm Tiến Dũng', class: '6a1', status: 'Nghỉ học', dob: '14/09/2014', gender: 'Nam/Male', pricePerSession: 200000, attendance: 75, score: 6.5 },
 
   // Class 6 Star (6a2)
-  { id: 'ED0125310021', name: 'Hoàng Minh Đức', class: '6a2', status: 'Đang theo học', dob: '30/01/2014', gender: 'Nam/Male', advisor: 'Nguyễn Văn Hùng', pricePerSession: 180000, attendance: 90, score: 8.0 },
-  { id: 'ED0125310022', name: 'Vũ Khánh Huyền', class: '6a2', status: 'Đang theo học', dob: '19/04/2014', gender: 'Nữ/Female', advisor: 'Nguyễn Văn Hùng', pricePerSession: 180000, attendance: 96, score: 9.2 },
-  { id: 'ED0125310023', name: 'Đặng Gia Huy', class: '6a2', status: 'Đang theo học', dob: '11/11/2014', gender: 'Nam/Male', advisor: 'Nguyễn Văn Hùng', pricePerSession: 180000, attendance: 85, score: 7.5 },
+  { id: 'ED0125310021', name: 'Hoàng Minh Đức', class: '6a2', status: 'Đang theo học', dob: '30/01/2014', gender: 'Nam/Male', pricePerSession: 180000, attendance: 90, score: 8.0 },
+  { id: 'ED0125310022', name: 'Vũ Khánh Huyền', class: '6a2', status: 'Đang theo học', dob: '19/04/2014', gender: 'Nữ/Female', pricePerSession: 180000, attendance: 96, score: 9.2 },
+  { id: 'ED0125310023', name: 'Đặng Gia Huy', class: '6a2', status: 'Đang theo học', dob: '11/11/2014', gender: 'Nam/Male', pricePerSession: 180000, attendance: 85, score: 7.5 },
 
   // Class 6 Galaxy (6a3)
-  { id: 'ED0125310041', name: 'Bùi Bảo Lâm', class: '6a3', status: 'Đang theo học', dob: '05/02/2014', gender: 'Nam/Male', advisor: 'Lê Thị Thu', pricePerSession: 220000, attendance: 100, score: 9.8 },
-  { id: 'ED0125310042', name: 'Đỗ Thùy Linh', class: '6a3', status: 'Đang theo học', dob: '22/08/2014', gender: 'Nữ/Female', advisor: 'Lê Thị Thu', pricePerSession: 220000, attendance: 92, score: 8.7 },
+  { id: 'ED0125310041', name: 'Bùi Bảo Lâm', class: '6a3', status: 'Đang theo học', dob: '05/02/2014', gender: 'Nam/Male', pricePerSession: 220000, attendance: 100, score: 9.8 },
+  { id: 'ED0125310042', name: 'Đỗ Thùy Linh', class: '6a3', status: 'Đang theo học', dob: '22/08/2014', gender: 'Nữ/Female', pricePerSession: 220000, attendance: 92, score: 8.7 },
 
   // Class 7 Sun (7a1)
-  { id: 'ED0119310177', name: 'Bùi Anujin Thúy An', class: '7a1', status: 'Đang theo học', dob: '18/10/2013', gender: 'Nữ/Female', advisor: 'Đặng Thị Thúy Hằng', pricePerSession: 200000, attendance: 98, score: 9.5 },
-  { id: 'ED0121310006', name: 'Dương Lê An', class: '7a1', status: 'Đang theo học', dob: '07/05/2013', gender: 'Nữ/Female', advisor: 'Đặng Thị Thúy Hằng', pricePerSession: 200000, attendance: 94, score: 8.8 },
-  { id: 'ED0119310031', name: 'Trần Quý Phương An', class: '7a1', status: 'Đang theo học', dob: '16/07/2013', gender: 'Nữ/Female', advisor: 'Đặng Thị Thúy Hằng', pricePerSession: 200000, attendance: 91, score: 8.2 },
-  { id: 'ED0120310015', name: 'Phạm Nguyễn Vân Anh', class: '7a1', status: 'Đang theo học', dob: '28/01/2013', gender: 'Nữ/Female', advisor: 'Đặng Thị Thúy Hằng', pricePerSession: 200000, attendance: 89, score: 7.9 },
+  { id: 'ED0119310177', name: 'Bùi Anujin Thúy An', class: '7a1', status: 'Đang theo học', dob: '18/10/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 98, score: 9.5 },
+  { id: 'ED0121310006', name: 'Dương Lê An', class: '7a1', status: 'Đang theo học', dob: '07/05/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 94, score: 8.8 },
+  { id: 'ED0119310031', name: 'Trần Quý Phương An', class: '7a1', status: 'Đang theo học', dob: '16/07/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 91, score: 8.2 },
+  { id: 'ED0120310015', name: 'Phạm Nguyễn Vân Anh', class: '7a1', status: 'Đang theo học', dob: '28/01/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 89, score: 7.9 },
 
   // Class 7 Venus (7a2)
-  { id: 'ED0123310009', name: 'Trần Bảo Châu', class: '7a2', status: 'Đang theo học', dob: '01/10/2013', gender: 'Nữ/Female', advisor: 'Lê Minh Khôi', pricePerSession: 200000, attendance: 93, score: 8.6 },
-  { id: 'ED0121310013', name: 'Lê Mai Chi', class: '7a2', status: 'Đang theo học', dob: '04/12/2013', gender: 'Nữ/Female', advisor: 'Lê Minh Khôi', pricePerSession: 200000, attendance: 87, score: 7.4 },
-  { id: 'ED0119310060', name: 'Nguyễn Bích Diệp', class: '7a2', status: 'Đang theo học', dob: '29/12/2013', gender: 'Nữ/Female', advisor: 'Lê Minh Khôi', pricePerSession: 200000, attendance: 95, score: 9.1 },
-  { id: 'ED0123310004', name: 'Đỗ Khánh Duy', class: '7a2', status: 'Đang theo học', dob: '13/07/2013', gender: 'Nam/Male', advisor: 'Lê Minh Khôi', pricePerSession: 200000, attendance: 82, score: 7.0 },
+  { id: 'ED0123310009', name: 'Trần Bảo Châu', class: '7a2', status: 'Đang theo học', dob: '01/10/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 93, score: 8.6 },
+  { id: 'ED0121310013', name: 'Lê Mai Chi', class: '7a2', status: 'Đang theo học', dob: '04/12/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 87, score: 7.4 },
+  { id: 'ED0119310060', name: 'Nguyễn Bích Diệp', class: '7a2', status: 'Đang theo học', dob: '29/12/2013', gender: 'Nữ/Female', pricePerSession: 200000, attendance: 95, score: 9.1 },
+  { id: 'ED0123310004', name: 'Đỗ Khánh Duy', class: '7a2', status: 'Đang theo học', dob: '13/07/2013', gender: 'Nam/Male', pricePerSession: 200000, attendance: 82, score: 7.0 },
 ];
 
 // Helper to generate dates for March 2026
@@ -110,7 +123,7 @@ export const mockAssignments: Assignment[] = [
     description: 'Describe the trends shown in the line graph on page 45 of your textbook.', 
     dueDate: '2026-03-25', 
     status: 'PENDING', 
-    teacherId: 't1',
+    teacherId: 'T001',
     grade: '10',
     classId: '10A1',
     pdfUrl: 'https://example.com/writing-task-1.pdf',
@@ -122,7 +135,7 @@ export const mockAssignments: Assignment[] = [
     description: 'Rewrite the following 10 sentences using the passive voice. Minimum 15 words per sentence.', 
     dueDate: '2026-03-22', 
     status: 'SUBMITTED', 
-    teacherId: 't1',
+    teacherId: 'T001',
     grade: '10',
     classId: '10A1',
     pdfUrl: 'https://example.com/passive-voice-ex.pdf'
@@ -130,7 +143,7 @@ export const mockAssignments: Assignment[] = [
 ];
 
 export const mockEvaluations: Evaluation[] = [
-  { id: '1', studentId: 'ED0119310177', teacherId: 't1', score: 9, comment: 'Excellent progress, very active during discussions.', date: '2026-03-15' },
+  { id: '1', studentId: 'ED0119310177', teacherId: 'T001', score: 9, comment: 'Excellent progress, very active during discussions.', date: '2026-03-15' },
 ];
 
 export interface Schedule {

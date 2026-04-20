@@ -1,13 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/auth-context';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { mockStudents } from '@/services/mockData';
-import { Search, UserPlus, Mail, Phone, MapPin } from 'lucide-react';
+import { Search, UserPlus, Mail, Phone, MapPin, Edit, Trash2 } from 'lucide-react';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { cn } from '@/lib/utils';
 
@@ -23,11 +22,12 @@ interface StudentType {
 export default function StudentsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const columns: Column<StudentType>[] = [
     {
       key: 'name',
-      header: t('common.name'),
+      header: 'Họ và tên',
       sortable: true,
       render: (value, student) => (
         <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export default function StudentsPage() {
             className="w-8 h-8 rounded-full border border-border shadow-sm"
           />
           <div>
-            <p className="text-sm font-bold text-text-primary leading-tight">{student.name}</p>
+            <p className="text-sm font-semibold text-text-primary leading-tight">{student.name}</p>
             <p className="text-[11px] text-text-secondary">{student.email}</p>
           </div>
         </div>
@@ -45,17 +45,17 @@ export default function StudentsPage() {
     },
     {
       key: 'class',
-      header: 'Class',
+      header: 'Lớp',
       sortable: true,
       render: (value) => (
-        <Badge variant="info" className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border-gold-200 text-gold-700 bg-gold-50">
+        <Badge variant="info" className="text-[10px] font-semibold px-2 py-0.5 rounded-full border-gold-200 text-gold-700 bg-gold-50">
           {value}
         </Badge>
       )
     },
     {
       key: 'attendance',
-      header: t('attendance.attendance_rate'),
+      header: 'Tỷ lệ chuyên cần',
       sortable: true,
       render: (value) => (
         <div className="flex items-center gap-3">
@@ -69,18 +69,18 @@ export default function StudentsPage() {
               style={{ width: `${value}%` }}
             />
           </div>
-          <span className="text-xs font-bold text-text-primary">{value}%</span>
+          <span className="text-xs font-semibold text-text-primary">{value}%</span>
         </div>
       )
     },
     {
       key: 'score',
-      header: 'Score',
+      header: 'Điểm số',
       sortable: true,
       align: 'center',
       render: (value) => (
         <span className={cn(
-          "text-sm font-bold px-2 py-1 rounded bg-background border border-border",
+          "text-sm font-semibold px-2 py-1 rounded bg-background border border-border",
           value >= 8 ? "text-success border-success/20 bg-success/5" : 
           value >= 5 ? "text-warning border-warning/20 bg-warning/5" : "text-error border-error/20 bg-error/5"
         )}>
@@ -90,15 +90,15 @@ export default function StudentsPage() {
     },
     {
       key: 'actions',
-      header: t('common.actions'),
+      header: '',
       align: 'right',
-      render: (_, student) => (
+      render: (_, student) => isAdmin && (
         <div className="flex items-center justify-end gap-1">
-          <Button size="sm" variant="ghost" className="h-8 px-2 text-[11px] hover:bg-gold-50 hover:text-gold-600 transition-colors">
-            {t('common.edit')}
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-gold-600 hover:bg-gold-50">
+            <Edit className="w-3.5 h-3.5" />
           </Button>
-          <Button size="sm" variant="ghost" className="h-8 px-2 text-[11px] text-error hover:text-error hover:bg-error/10 transition-colors">
-            {t('common.delete')}
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+            <Trash2 className="w-3.5 h-3.5" />
           </Button>
         </div>
       )
@@ -106,17 +106,17 @@ export default function StudentsPage() {
   ];
 
   return (
-    <div className="p-4 lg:p-8 space-y-6 w-full mx-auto bg-background min-h-screen">
+    <div className="p-4 lg:p-8 space-y-6 w-full mx-auto bg-[#F8FAFC] min-h-full">
       <DataTable 
-        title="Student Management"
+        title="Danh sách học sinh"
         columns={columns} 
         data={mockStudents as StudentType[]} 
-        pageSize={8}
+        pageSize={10}
         actions={
-          user?.role === 'ADMIN' && (
-            <Button size="sm" className="h-10 px-4 bg-gold-500 hover:bg-gold-600 text-white shadow-lg shadow-gold-500/20 font-bold gap-2">
+          isAdmin && (
+            <Button size="sm" className="h-10 px-4 bg-gold-500 hover:bg-gold-600 text-white shadow-lg shadow-gold-500/20 font-semibold gap-2 border-none">
               <UserPlus className="w-4 h-4" />
-              Add Student
+              Thêm học sinh
             </Button>
           )
         }

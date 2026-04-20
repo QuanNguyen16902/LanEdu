@@ -36,7 +36,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/Collapsible';
-import { ManagementSidebar } from '@/components/ManagementSidebar';
 
 const PAYMENTS_MOCK = [
   { id: 'PAY-001', studentId: 'ED0119310177', name: 'Bùi Anujin Thúy An', class: '7BA1', month: '03/2024', amount: 1500000, status: 'PAID', date: '15/03/2024' },
@@ -110,15 +109,14 @@ export default function TuitionFeePage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-[#F8FAFC]">
-      <ManagementSidebar activeMenu="hoc-phi" onMenuChange={() => {}} />
+    <div className="flex h-full w-full overflow-hidden bg-[#F8FAFC]">
 
       <div className="flex-1 flex flex-col min-w-0 m-3 space-y-3">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Tổng doanh thu dự kiến</p>
+              <p className="text-[11px] font-medium text-gray-400 tracking-wider">Tổng doanh thu dự kiến</p>
               <h3 className="text-xl font-semibold text-gray-900 mt-1">{stats.total.toLocaleString()}đ</h3>
             </div>
             <div className="p-2.5 bg-gray-50 rounded-lg">
@@ -127,7 +125,7 @@ export default function TuitionFeePage() {
           </div>
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Đã thu</p>
+              <p className="text-[11px] font-medium text-gray-400 tracking-wider">Đã thu</p>
               <h3 className="text-xl font-semibold text-emerald-600 mt-1">{stats.paid.toLocaleString()}đ</h3>
             </div>
             <div className="p-2.5 bg-emerald-50 rounded-lg">
@@ -136,7 +134,7 @@ export default function TuitionFeePage() {
           </div>
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">Chưa thu</p>
+              <p className="text-[11px] font-medium text-gray-400 tracking-wider">Chưa thu</p>
               <h3 className="text-xl font-semibold text-[#E6B800] mt-1">{stats.pending.toLocaleString()}đ</h3>
             </div>
             <div className="p-2.5 bg-gold-50/50 rounded-lg">
@@ -180,15 +178,15 @@ export default function TuitionFeePage() {
                 <TableHeader className="bg-[#F1F5F9] sticky top-0 z-10 border-b border-gray-300">
                   <TableRow className="h-10 hover:bg-transparent transition-none border-b border-gray-200">
                     <TableHead className="w-8 border-r border-gray-200"></TableHead>
-                    <TableHead className="w-12 text-center text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">TT</TableHead>
-                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Mã học sinh</TableHead>
-                    <TableHead className="w-48 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Họ tên</TableHead>
-                    <TableHead className="w-24 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Lớp</TableHead>
-                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Tháng</TableHead>
-                    <TableHead className="w-32 text-right text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Số tiền</TableHead>
-                    <TableHead className="w-32 text-center text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Trạng thái</TableHead>
-                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Ngày thu</TableHead>
-                    <TableHead className="w-24 text-center text-[11px] font-medium text-gray-500 uppercase px-3">Thao tác</TableHead>
+                    <TableHead className="w-12 text-center text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">TT</TableHead>
+                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Mã học sinh</TableHead>
+                    <TableHead className="w-48 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Họ tên</TableHead>
+                    <TableHead className="w-24 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Lớp</TableHead>
+                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Tháng</TableHead>
+                    <TableHead className="w-32 text-right text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Số tiền</TableHead>
+                    <TableHead className="w-32 text-center text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Trạng thái</TableHead>
+                    <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Ngày thu</TableHead>
+                    <TableHead className="w-24 text-center text-[11px] font-medium text-gray-500 px-3">Thao tác</TableHead>
                   </TableRow>
                   <TableRow className="h-8 bg-white border-b border-gray-200">
                    <TableCell className="border-r border-gray-200"></TableCell>

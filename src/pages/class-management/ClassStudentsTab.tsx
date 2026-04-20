@@ -23,6 +23,7 @@ interface ClassStudentsTabProps {
   toggleAll: () => void;
   onOpenDetails?: (student: Student) => void;
   onEdit?: (student: Student) => void;
+  schedule?: string;
 }
 
 export function ClassStudentsTab({
@@ -34,6 +35,7 @@ export function ClassStudentsTab({
   toggleAll,
   onOpenDetails,
   onEdit,
+  schedule
 }: ClassStudentsTabProps) {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
@@ -53,15 +55,11 @@ export function ClassStudentsTab({
               <TableHead className="w-44 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Họ tên</TableHead>
               <TableHead className="w-28 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Ngày sinh</TableHead>
               <TableHead className="w-24 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Giới tính</TableHead>
-              <TableHead className="w-28 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Giờ học</TableHead>
-              <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">GVCN/ Advisor</TableHead>
               <TableHead className="w-28 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Học phí</TableHead>
               <TableHead className="w-24 text-center text-[11px] font-medium text-gray-500 px-3">Thao tác</TableHead>
             </TableRow>
             <TableRow className="h-8 bg-white border-b border-gray-200">
               <TableCell className="border-r border-gray-200" />
-              <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
-              <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
               <TableCell className="border-r border-gray-200 px-2 text-center opacity-40"><Search className="w-3 h-3 mx-auto" /></TableCell>
@@ -81,8 +79,8 @@ export function ClassStudentsTab({
                 <TableCell className="px-2 border-r border-gray-200">
                   <Checkbox checked={selectedRows.has(student.id)} onCheckedChange={() => toggleRow(student.id)} />
                 </TableCell>
-                <TableCell className="text-[11px] text-gray-500 px-3 border-r border-gray-200">{idx + 1}</TableCell>
-                <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">{idx + 1}</TableCell>
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">
                   <span className={cn(
                     "px-1.5 py-0.5 rounded text-[9px] font-bold border",
                     student.status === 'Học viên chính thức' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
@@ -90,8 +88,8 @@ export function ClassStudentsTab({
                     {student.status === 'Học viên chính thức' ? 'CHÍNH THỨC' : 'TIỀM NĂNG'}
                   </span>
                 </TableCell>
-                <TableCell className="text-[11px] font-medium text-gray-900 px-3 border-r border-gray-200">{student.id}</TableCell>
-                <TableCell className="text-[11px] font-semibold text-gray-900 px-3 border-r border-gray-200">
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">{student.id}</TableCell>
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">
                   <button
                     onClick={() => onOpenDetails?.(student)}
                     className="hover:text-gold-600 hover:underline transition-all text-left"
@@ -99,11 +97,9 @@ export function ClassStudentsTab({
                     {student.name}
                   </button>
                 </TableCell>
-                <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">{student.dob}</TableCell>
-                <TableCell className="text-[11px] text-gray-600 px-3 border-r border-gray-200">{student.gender}</TableCell>
-                <TableCell className="text-[11px] text-gray-500 px-3 border-r border-gray-200">18:00 - 20:00</TableCell>
-                <TableCell className="text-[11px] text-gray-400 px-3 border-r border-gray-200 italic">MS. TÚ AN_1</TableCell>
-                <TableCell className="text-[11px] font-bold text-gray-700 px-3 border-r border-gray-200 tabular-nums">
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">{student.dob}</TableCell>
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200">{student.gender}</TableCell>
+                <TableCell className="text-[11px] text-gray-800 px-3 border-r border-gray-200 tabular-nums">
                   {(student.pricePerSession ?? 180000).toLocaleString('vi-VN')}đ
                 </TableCell>
                 <TableCell className="text-center px-2">

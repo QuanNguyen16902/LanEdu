@@ -26,7 +26,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/Table';
-import { ManagementSidebar } from '@/components/ManagementSidebar';
 
 const SCHEDULE_MOCK = [
   { id: 'S-001', classId: '7BA1', subject: 'Toán học', teacher: 'Nguyễn Văn A', time: '08:00 - 09:30', date: '2024-03-25', day: 'Thứ 2', room: 'P.101' },
@@ -44,8 +43,7 @@ export default function SchedulePage() {
   const [selectedWeek, setSelectedWeek] = useState('25/03 - 31/03');
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden bg-[#F8FAFC]">
-      <ManagementSidebar activeMenu="lich-hoc" onMenuChange={() => {}} />
+    <div className="flex h-full w-full overflow-hidden bg-[#F8FAFC]">
 
       <div className="flex-1 flex flex-col min-w-0 m-3 bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden transition-all duration-300">
         {/* Header toolbar */}
@@ -65,7 +63,7 @@ export default function SchedulePage() {
                 )}
               >
                 <CalendarIcon className="w-3.5 h-3.5" />
-                Calendar
+                Lịch tháng
               </button>
               <button 
                 onClick={() => setViewMode('list')}
@@ -75,7 +73,7 @@ export default function SchedulePage() {
                 )}
               >
                 <List className="w-3.5 h-3.5" />
-                List view
+                Dạng danh sách
               </button>
             </div>
           </div>
@@ -150,7 +148,7 @@ export default function SchedulePage() {
                             height: '112px'
                           }}
                         >
-                          <p className="text-[10px] font-bold text-[#B38600] uppercase tracking-tighter">{item.classId}</p>
+                          <p className="text-[10px] font-semibold text-[#B38600] tracking-tighter">{item.classId}</p>
                           <p className="text-[11px] font-semibold text-gray-900 mt-1 truncate">{item.subject}</p>
                           <div className="space-y-1 mt-2">
                              <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
@@ -177,13 +175,13 @@ export default function SchedulePage() {
                   <TableHeader className="bg-[#F1F5F9] sticky top-0 z-10 border-b border-gray-300">
                     <TableRow className="h-10 hover:bg-transparent transition-none border-b border-gray-200">
                       <TableHead className="w-8 border-r border-gray-200"></TableHead>
-                      <TableHead className="w-32 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Thứ / Ngày</TableHead>
-                      <TableHead className="w-32 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Thời gian</TableHead>
-                      <TableHead className="w-24 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Lớp</TableHead>
-                      <TableHead className="w-48 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Môn học</TableHead>
-                      <TableHead className="w-48 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Giáo viên</TableHead>
-                      <TableHead className="w-24 text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Phòng</TableHead>
-                      <TableHead className="text-[11px] font-medium text-gray-500 uppercase px-3 border-r border-gray-200">Ghi chú</TableHead>
+                      <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Thứ / Ngày</TableHead>
+                      <TableHead className="w-32 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Thời gian</TableHead>
+                      <TableHead className="w-24 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Lớp</TableHead>
+                      <TableHead className="w-48 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Môn học</TableHead>
+                      <TableHead className="w-48 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Giáo viên</TableHead>
+                      <TableHead className="w-24 text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Phòng</TableHead>
+                      <TableHead className="text-[11px] font-medium text-gray-500 px-3 border-r border-gray-200">Ghi chú</TableHead>
                       <TableHead className="w-12 border-r border-gray-200"></TableHead>
                     </TableRow>
                     <TableRow className="h-8 bg-white border-b border-gray-200">

@@ -78,9 +78,11 @@ export function StudentDetailPanel({
                         </span>
                         <span className={cn(
                           "text-[9px] font-bold px-2 py-0.5 rounded-full border",
-                          record.status === 'PRESENT' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
+                          record.status === 'PRESENT' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : 
+                          record.status === 'LATE' ? "bg-amber-50 text-amber-600 border-amber-100" :
+                          "bg-rose-50 text-rose-600 border-rose-100"
                         )}>
-                          {record.status === 'PRESENT' ? 'CÓ MẶT' : 'VẮNG'}
+                          {record.status === 'PRESENT' ? 'CÓ MẶT' : record.status === 'LATE' ? 'MUỘN' : 'VẮNG'}
                         </span>
                       </div>
                     ))}

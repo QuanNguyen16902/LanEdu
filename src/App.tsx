@@ -11,6 +11,7 @@ import EvaluationsPage from '@/pages/Evaluations';
 import StudentsPage from '@/pages/Students';
 import ClassManagementPage from '@/pages/ClassManagement';
 import PostsPage from '@/pages/Posts';
+import TeachersPage from '@/pages/Teachers';
 import TuitionFeePage from '@/pages/TuitionFee';
 import SchedulePage from '@/pages/Schedule';
 import UnauthorizedPage from '@/pages/Unauthorized';
@@ -61,8 +62,8 @@ export default function App() {
               </ProtectedRoute>
             } />
             <Route path="/teachers" element={
-              <ProtectedRoute allowedRoles={['ADMIN']}>
-                <div className="p-8"><h1 className="text-2xl font-bold">Quản lý giáo viên (Admin only)</h1></div>
+              <ProtectedRoute allowedRoles={['ADMIN', 'TEACHER']}>
+                <TeachersPage />
               </ProtectedRoute>
             } />
             <Route path="/payments" element={
